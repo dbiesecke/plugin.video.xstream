@@ -34,7 +34,6 @@ class cPlayer:
 
         # For older Versions; dirty but works 
         if (cConfig().isDharma() == False):
-            print "Player test"
             oInputParameterHandler = ParameterHandler()
             aParams = oInputParameterHandler.getAllParameters()
 

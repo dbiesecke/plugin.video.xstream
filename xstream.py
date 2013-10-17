@@ -53,7 +53,7 @@ def parseUrl():
                 import resources.lib.handler.metaHandler as metahandlers
                 #from metahandler import metahandlers
             except:
-                logger.info("Could not import package 'metahandler'")
+                logger.info("Could not import package 'metaHandler'")
                 return
             meta = metahandlers.MetaData()
             params = oInputParameterHandler
@@ -154,6 +154,11 @@ def parseUrl():
             import urlresolver
             urlresolver.display_settings()
             return
+        # If metahandler settings are called    
+        if sSiteName == 'metahandler':
+            import metahandler
+            metahandler.display_settings()
+            return
         # Else load any other site as plugin and run the function
         plugin = __import__(sSiteName, globals(), locals())
         function = getattr(plugin, sFunction)
@@ -214,6 +219,15 @@ def showMainMenu(sFunction):
       oGuiElement.setFunction("display_settings")
       oGuiElement.setThumbnail("DefaultAddonService.png")
       oGui.addFolder(oGuiElement)
+      
+      if cConfig().getSetting('metahandler')=='true':
+      # Create a gui element for metahandler settings
+          oGuiElement = cGuiElement()
+          oGuiElement.setTitle("Metahandler Settings")
+          oGuiElement.setSiteName("metahandler")
+          oGuiElement.setFunction("display_settings")
+          oGuiElement.setThumbnail("DefaultAddonService.png")
+          oGui.addFolder(oGuiElement)
 
     oGui.setEndOfDirectory()
 

@@ -31,6 +31,7 @@ class cRequestHandler:
         self.__setDefaultHeader()
         self.setCachePath()
         self.__setCookiePath()
+        self.__sResponseHeader = ''
 
 
     def removeNewLines(self, bRemoveNewLines):
@@ -96,6 +97,7 @@ class cRequestHandler:
                 for sHeaderKey, sHeaderValue in aHeader.items():
                     oRequest.add_header(sHeaderKey, sHeaderValue)
         cookieJar.add_cookie_header(oRequest)
+        
         if self.caching and self.cacheTime > 0:
             sContent = self.readCache(self.getRequestUri())
             if sContent:
@@ -153,7 +155,7 @@ class cRequestHandler:
         
         oResponse.close()
         if self.caching and self.cacheTime > 0:
-            self.writeCache(oRequest.get_full_url(), sContent)
+            self.writeCache(self.getRequestUri(), sContent)
 
         return sContent
 
@@ -189,6 +191,7 @@ class cRequestHandler:
             except:
                logger.info('Could not read Cache')
             if content:
+                logger.info('read html for %s from cache' % url)
                 return content
         return ''
 

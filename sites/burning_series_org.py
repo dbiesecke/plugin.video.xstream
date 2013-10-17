@@ -140,7 +140,7 @@ def showSeries():
         aResult = oParser.parse(sHtmlContent, sPattern)
         if aResult[0]:
              for aEntry in aResult[1]:
-                sTitle = cUtil().unescape(aEntry[1])                             
+                sTitle = cUtil().unescape(aEntry[1].decode('utf-8')).encode('utf-8')                             
                 __createMenuEntry(oGui, 'showSeasons', sTitle,
                   [['siteUrl', URL_MAIN + '/' + str(aEntry[0])],['Title', sTitle]], sTitle, len(aResult[1]))
 

@@ -338,6 +338,7 @@ class MetaData(metahandlers.MetaData):
         meta['episode'] = int(self._check(episode.episode_number,0))
               
         return meta
+        
     def update_meta(self, media_type, name, imdb_id, tmdb_id='', new_imdb_id='', new_tmdb_id='', year=''):
         '''
         Updates and returns meta data for given movie/tvshow, mainly to be used with refreshing individual movies.
@@ -387,6 +388,41 @@ class MetaData(metahandlers.MetaData):
             new_tmdb_id = tmdb_id
             
         return self.get_meta(media_type, name, new_imdb_id, new_tmdb_id, year, overlay)
+        
+    def search_movies(self, name):
+        '''
+        Requests meta data from TMDB for any movie matching name
+        
+        Args:
+            name (str): full name of movie you are searching
+                        
+        Returns:
+            Arry of dictionaries with trimmed down meta data, only returned data that is required:
+            - IMDB ID
+            - TMDB ID
+            - Name
+            - Year
+        ''' 
+        common.addon.log('---------------------------------------------------------------------------------------', 2)
+        common.addon.log('Meta data refresh - searching for movie: %s' % name, 2)
+        tmdb = TMDB(lang = 'de')
+        movie_list = []
+        meta = tmdb.tmdb_search(name)
+        if meta:
+            for movie in meta:
+                print movie
+                if movie['released']:
+                    #year = self._convert_date(movie['released'], '%Y-%m-%d', '%Y')
+                    year = movie['released'][:4]
+                else:
+                    year = None
+                movie_list.append({'title': movie['name'], 'imdb_id': movie['imdb_id'], 'tmdb_id': movie['id'], 'year': year})
+        else:
+            common.addon.log('No results found', 2)
+            return None
+
+        common.addon.log('Returning results: %s' % movie_list, 0)
+        return movie_list
 
 
 class TheTVDB(thetvdbapi.TheTVDB):
@@ -484,6 +520,7 @@ class TheTVDB(thetvdbapi.TheTVDB):
 class TMDB(TMDB):
 
     def _search_movie(self, name, year=''):
+        print name +' '+ year
         ''' Helper method to start a TMDB Movie.search request - search by Name/Year '''
         # no usage of clean_name, otherwise names with so called 'umlauten' can't be found
         name = urllib.quote(name)

@@ -341,12 +341,15 @@ def getHosters():
 def getHosterUrl(sUrl):
     results = []
     if 'g-stream.in/secure/' in sUrl :
-        params = ParameterHandler()              
-        oRequest = cRequestHandler(sUrl)
+        sHoster = sUrl.split('secure/')[-1].split('/')[0]
+        params = ParameterHandler()        
+        oRequest = cRequestHandler(sUrl, False)
         oRequest.addHeaderEntry('Cookie', params.getValue('securityCookie'))
+        oRequest.addHeaderEntry('Referer', params.getValue('movieUrl'))
         try:
             oRequest.request()
             sUrl = oRequest.getRealUrl()
+            sUrl = 'http://%s%s' % (sHoster, sUrl.split(sHoster)[-1])
         except:
             pass
     result = {}

@@ -258,16 +258,16 @@ def showSearch():
 
 def _search(oGui, sSearchText):
     # dummy request to obtain securekey
-    oRequest = cRequestHandler('http://www.movie4k.to/searchAutoCompleteNew.php?search=the')
-    response = oRequest.request()
-    oParser = cParser()
-    aResult = oParser.parse(response, 'securekey=([^&]+)&')
-    if aResult[0]:
-        key = str(aResult[1][0])
+    #oRequest = cRequestHandler('http://www.movie4k.to/searchAutoCompleteNew.php?search=the')
+    #response = oRequest.request()
+    #oParser = cParser()
+    #aResult = oParser.parse(response, 'securekey=([^&]+)&')
+    #if aResult[0]:
+    #    key = str(aResult[1][0])
     # perform search
     oRequest = cRequestHandler(URL_SEARCH)
     oRequest.addParameters('search', sSearchText)
-    oRequest.addParameters('securekey', key)
+    #oRequest.addParameters('securekey', key)
     response = oRequest.request()
     sUrl = URL_SEARCH
     __parseMovieSimpleList(sUrl, 1, oGui, response)
@@ -639,11 +639,10 @@ def showHoster(sUrl):
         for aEntry in aResult[1]:
             result = parseHosterDirect(sHtmlContent)#, sHoster.lower(), sMovieTitle)
             result['title'] = sMovieTitle + ' Part ' + aEntry[2]
-            results.append(result)
+            results.append(result)  
         return results
     else:
         result = parseHosterDirect(sHtmlContent)#, sHoster.lower(), sMovieTitle)
-        print 'test'+ str(result)
         results.append(result)
         return results
   
@@ -666,14 +665,14 @@ def __getMovieTitle(sHtmlContent):
 def parseHosterDirect(sHtmlContent, sHoster = '', sMovieTitle = ''):
     oParser = cParser()
     #Link oder Iframe suchen der den Hosternamen enthält
-    sPattern = 'id="maincontent5".*?(?:target="_blank" href|iframe src|value)="([^"]+)".*?id="underplayer">'
+    sPattern = 'id="maincontent5".*?(?:target="_blank" href|iframe.*?src|value)="([^"]+)".*?id="underplayer">'
     aResult = oParser.parse(sHtmlContent, sPattern)
     if (aResult[0] == True):
         sStreamUrl = aResult[1][0]    
         result = {}
         result['streamUrl'] = sStreamUrl
         result['resolved'] = False
-        return result   
+        return result
     return False
     
 def __getLanguage(sString):

@@ -136,10 +136,10 @@ class cHosterGui:
         sSeason = oInputParameterHandler.getValue('season')
         sEpisode = oInputParameterHandler.getValue('episode')
         sShowTitle = oInputParameterHandler.getValue('TvShowTitle')
-        sThumbnail = oInputParameterHandler.getValue('thumb')
-        
+        sThumbnail = oInputParameterHandler.getValue('thumb')       
         if siteResult:
             sMediaUrl = siteResult['streamUrl']
+            logger.info('call play: ' + sMediaUrl)
             if siteResult['resolved']:
                 sLink = sMediaUrl
             else:
@@ -148,10 +148,13 @@ class cHosterGui:
                 except:
                     sLink = False
                     #raise
-        else:
+        elif sMediaUrl:
+            logger.info('call play: ' + sMediaUrl)
             sLink = urlresolver.resolve(sMediaUrl)
-        logger.info('call play: ' + sMediaUrl)
-        if sLink:            
+        else:
+            oGui.showError('xStream', 'Hosterlink not found', 5)
+            return False
+        if sLink != False:            
             logger.info('file link: ' + sLink)
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(self.SITE_NAME)
@@ -164,13 +167,17 @@ class cHosterGui:
                 oGuiElement.addItemProperties('Season',sSeason)
                 oGuiElement.addItemProperties('TvShowTitle',sShowTitle)
             #listItem = xbmcgui.ListItem(path=sLink)
+            #listItem.setProperty('IsPlayable', 'true')
             #pluginHandle = cPluginHandler().getPluginHandle()
             #return xbmcplugin.setResolvedUrl(pluginHandle, True, listItem)
             oPlayer = cPlayer()
             oPlayer.clearPlayList()
             oPlayer.addItemToPlaylist(oGuiElement)
             if self.dialog:
-                self.dialog.close()
+                try:
+                    self.dialog.close()
+                except:
+                    pass
             oPlayer.startPlayer()
         else:
             logger.info('file link: ' + str(sLink))
@@ -185,6 +192,16 @@ class cHosterGui:
 
         sMediaUrl = oInputParameterHandler.getValue('sMediaUrl')
         sFileName = oInputParameterHandler.getValue('sFileName')
+        if not sFileName:
+            sFileName = oInputParameterHandler.getValue('Title')
+        if not sFileName:
+            sFileName = oInputParameterHandler.getValue('title')
+        if not sFileName: #nur vorrübergehend
+            sFileName = oInputParameterHandler.getValue('sMovieTitle')
+        sSeason = oInputParameterHandler.getValue('season')
+        sEpisode = oInputParameterHandler.getValue('episode')
+        sShowTitle = oInputParameterHandler.getValue('TvShowTitle')
+        sThumbnail = oInputParameterHandler.getValue('thumb')
         if siteResult:
             sMediaUrl = siteResult['streamUrl']
             if siteResult['resolved']:
@@ -200,6 +217,12 @@ class cHosterGui:
             oGuiElement.setSiteName(self.SITE_NAME)
             oGuiElement.setMediaUrl(sLink)
             oGuiElement.setTitle(sFileName)
+            if sThumbnail:
+                oGuiElement.setThumbnail(sThumbnail)
+            if sShowTitle:
+                oGuiElement.addItemProperties('Episode',sEpisode)
+                oGuiElement.addItemProperties('Season',sSeason)
+                oGuiElement.addItemProperties('TvShowTitle',sShowTitle)
             if self.dialog:
                 self.dialog.close()
             oPlayer = cPlayer()
@@ -313,7 +336,7 @@ class cHosterGui:
                 # filter and sort hosters
                 siteResult = self.__getPriorities(siteResult)
             if not siteResult:
-                dilog.close()
+                self.dialog.close()
                 cGui().showInfo('xStream','no supported hoster available')
                 return
             self.dialog.update(100)
@@ -434,7 +457,7 @@ class cHosterGui:
                         break
                         return True
                 except:
-                    self.dialog.update(percent,'hoster %s failed' % hoster['name']) #crap, should be update
+                    self.dialog.update(percent,'hoster %s failed' % hoster['name'])
                     logger.info('playback with hoster %s failed' % hoster['name'])
                     pass
         # field "resolved" marks streamlinks

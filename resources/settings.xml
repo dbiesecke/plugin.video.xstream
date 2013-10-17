@@ -1,42 +1,41 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings> 
     <category label="30021">
-        <!--<setting label="30021" type="lsep"/>-->
-        <setting id="debug"         type="bool"     label="30000" default="false"/>
-        <setting id="playerType"    type="enum"     values="Auto|MPlayer|DVDPlayer" label="30001" default="2"/>
-        <setting id="autoPlay"      type="bool"     label="30005" default="false"/>
-        <setting id="prefLanguage"  type="enum"     values="ger|eng|all" label="30002" default="2"/>
-        <setting id="metahandler"   type="bool"     label="30004" default="false"/>
-        <setting id="cacheTime"     type="number"   label="30006" default="600"/>
-        <setting id="showAdult"     type="bool"     label="30003" default="false"/>
+        
+        <setting default="false" id="debug" label="30000" type="bool" />
+        <setting default="2" id="playerType" label="30001" type="enum" values="Auto|MPlayer|DVDPlayer" />
+        <setting default="false" id="autoPlay" label="30005" type="bool" />
+        <setting default="2" id="prefLanguage" label="30002" type="enum" values="ger|eng|all" />
+        <setting default="false" id="metahandler" label="30004" type="bool" />
+        <setting default="600" id="cacheTime" label="30006" type="number" />
+        <setting default="false" id="showAdult" label="30003" type="bool" />
         <setting type="sep" />
     </category> 
     <category label="30022">
-        <!--<setting label="30022" type="lsep"/>-->
-        <setting id="plugin_anime_proxer_me"    type="bool" label="Anime.Proxer.Me" default="false"/>
-        <setting id="plugin_anime_stream24_com" type="bool" label="Anime-Stream24.com" default="false"/>
-        <setting id="plugin_bundesliga_de"      type="bool" label="Bundesliga.de" default="false"/>
-        <setting id="plugin_burning_series_org" type="bool" label="Burning-Seri.es" default="false"/>
-        <setting id="plugin_gstream_in"         type="bool" label="G-Stream.in" default="false"/>
-        <setting id="plugin_kinox_to"           type="bool" label="Kinox.to" default="false"/>
-        <setting id="plugin_movie4k_to"         type="bool" label="Movie4k.to" default="false"/>
-        <setting id="plugin_stream_oase_tv"     type="bool" label="Stream-Oase.tv" default="false"/>
+        
+        <setting default="false" id="plugin_anime_proxer_me" label="Anime.Proxer.Me" type="bool" />
+        <setting default="false" id="plugin_anime_stream24_com" label="Anime-Stream24.com" type="bool" />
+        <setting default="false" id="plugin_bundesliga_de" label="Bundesliga.de" type="bool" />
+        <setting default="false" id="plugin_burning_series_org" label="Burning-Seri.es" type="bool" />
+        <setting default="false" id="plugin_gstream_in" label="G-Stream.in" type="bool" />
+        <setting default="false" id="plugin_kinox_to" label="Kinox.to" type="bool" />
+        <setting default="false" id="plugin_movie4k_to" label="Movie4k.to" type="bool" />
+        <setting default="false" id="plugin_stream_oase_tv" label="Stream-Oase.tv" type="bool" />
         <setting type="sep" />
     </category>
     <category label="Views">
-        <setting id="auto-view" 	type="bool"   label="automatische Views aktivieren" default="false"/>
-        <setting id="movies-view" 	type="number" label="Film-View" default="503" enable="!eq(-1,false)"/>
-        <setting id="tvshows-view" 	type="number" label="Serien-View" default="503" enable="!eq(-2,false)"/>
-        <setting id="seasons-view" 	type="number" label="Staffel-View" default="504" enable="!eq(-3,false)"/>
-        <setting id="episodes-view" type="number" label="Episoden-View" default="504" enable="!eq(-4,false)"/>
+        <setting default="false" id="auto-view" label="automatische Views aktivieren" type="bool" />
+        <setting default="503" enable="!eq(-1,false)" id="movies-view" label="Film-View" type="number" />
+        <setting default="503" enable="!eq(-2,false)" id="tvshows-view" label="Serien-View" type="number" />
+        <setting default="504" enable="!eq(-3,false)" id="seasons-view" label="Staffel-View" type="number" />
+        <setting default="504" enable="!eq(-4,false)" id="episodes-view" label="Episoden-View" type="number" />
     </category>
     <category label="30023">
-        <!--<setting label="30023" type="lsep"/>-->
-        <setting id="jd_enabled"            type="bool" label="30071" default="false"/>
-        <setting id="jd_host"               type="text" label="30072" default="127.0.0.1"/>
-        <setting id="jd_port"               type="text" label="30073" default="10025"/>
-        <setting id="jd_automatic_start"    type="bool" label="30074" default="true"/>
-        <setting id="jd_grabber"            type="bool" label="30075" default="false"/>
+        
+        <setting default="false" id="jd_enabled" label="30071" type="bool" />
+        <setting default="127.0.0.1" id="jd_host" label="30072" type="text" />
+        <setting default="10025" id="jd_port" label="30073" type="text" />
+        <setting default="true" id="jd_automatic_start" label="30074" type="bool" />
+        <setting default="false" id="jd_grabber" label="30075" type="bool" />
         <setting type="sep" />
     </category> 
 </settings>
