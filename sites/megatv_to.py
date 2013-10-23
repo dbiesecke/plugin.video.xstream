@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-#
-# Author: bullshit <me@oskarholowaty.com>
-# SCM: https://github.com/bullshit
-#
-
 from resources.lib.gui.gui import cGui
 from resources.lib.util import cUtil
 from resources.lib.gui.guiElement import cGuiElement
