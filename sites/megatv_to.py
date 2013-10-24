@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from resources.lib.gui.gui import cGui
-from resources.lib.util import cUtil
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
@@ -8,23 +7,11 @@ from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.config import cConfig
 from resources.lib import logger
 from resources.lib.player import cPlayer
-import string
 import xbmcaddon
 import os
 from os.path import join
 addon = xbmcaddon.Addon(id='plugin.video.xstream')
 
-# Prüfen ob der metahandler verwendet werden soll, dieser liefert Metainformationen (Poster, Fanarts,...)
-if cConfig().getSetting('metahandler')=='true':
-    META = True
-    try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
-    except:
-        META = False
-        logger.info("Could not import package 'metahandler'")
-else:
-    META = False
 
 SITE_IDENTIFIER = 'megatv_to'
 SITE_NAME = 'MegaTV.to'
