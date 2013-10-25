@@ -1,5 +1,5 @@
 # xStream XBMC Addon
-xStream is a xbmc plugin to watch streams from various german film, trailer, music and sport sites, but it is very simple to write your own site-plugin
+xStream is a xbmc plugin to watch streams from various german film, trailer, music and sport sites
 
 ## Available Sites:
 * anime-proxer.me `partially working`
