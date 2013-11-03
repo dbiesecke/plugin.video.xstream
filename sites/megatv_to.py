@@ -6,7 +6,6 @@ from resources.lib.parser import cParser
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.config import cConfig
 from resources.lib import logger
-from resources.lib.player import cPlayer
 import xbmcaddon
 import os
 from os.path import join
@@ -88,14 +87,14 @@ def _showChannels(sUrl):
     oGui = cGui()
     channels = _parseChannels(sUrl)
     for channel in channels:
-            oGuiElement = cGuiElement(channel['name'], SITE_IDENTIFIER, 'playChannel')
+            oGuiElement = cGuiElement(channel['name'], SITE_IDENTIFIER,'getHosters')#'playChannel')
             logger.info(channel['logo'])
             oGuiElement.setThumbnail(channel['logo'])
             oParams = ParameterHandler()
             oParams.setParam('channelKey',channel['key'])
             oParams.setParam('channelName',channel['name'])
             oParams.setParam('channelUrl',channel['url'])
-            oGui.addFolder(oGuiElement,oParams)
+            oGui.addFolder(oGuiElement,oParams, bIsFolder=False, iTotal = len(channels))
     oGui.setEndOfDirectory()
 
 def _parseChannels(sUrl):
@@ -127,7 +126,8 @@ def _parseChannels(sUrl):
             channels.append(channel)
     return channels
 
-def playChannel():
+#def playChannel():
+def getHosters():
     oParams = ParameterHandler()
     sChannelKey = oParams.getValue('channelKey')
     sChannelName = oParams.getValue('channelName')
@@ -138,32 +138,30 @@ def playChannel():
     oRequestHandler.addHeaderEntry('Referer', URL_MAIN)
     sHtmlContent = oRequestHandler.request();
 
+    hosters = []
 
     sPattern = "'file': '(.*?)',"
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
     if aResult[0]:
         sUrl = str(aResult[1])[2:-2]
-        logger.info('streaming url: ' + sUrl)
-        oGuiElement = cGuiElement()
-        oGuiElement.setSiteName(SITE_NAME)
-        logger.info('load channel ' + sChannelName + 'with url ' + sUrl)
-        oGuiElement.setMediaUrl(sUrl)
-        oGuiElement.setTitle(sChannelName)
+        logger.info('load channel ' + sChannelName + ' with url ' + sUrl)
 
-        '''
-        if sThumbnail:
-            oGuiElement.setThumbnail(sThumbnail)
-        if sShowTitle:
-            oGuiElement.addItemProperties('Episode',sEpisode)
-            oGuiElement.addItemProperties('Season',sSeason)
-            oGuiElement.addItemProperties('TvShowTitle',sShowTitle)
-        '''
+        hoster = {}
+        hoster['link'] = sUrl
+        hoster['name'] = 'streamcloud'  # dummy
+        hosters.append(hoster)
+    hosters.append('getHosterUrl')
+    return hosters
 
-        oPlayer = cPlayer()
-        oPlayer.clearPlayList()
-        oPlayer.addItemToPlaylist(oGuiElement)
-        oPlayer.startPlayer()
+def getHosterUrl(sUrl):
+    logger.info("getHosterUrl with url %s" % (sUrl))
+    results = []
+    result = {}
+    result['streamUrl'] = sUrl
+    result['resolved'] = True
+    results.append(result)
+    return results
 
 def _getChannelName(channelKey):
     return channelKey.upper().replace('-', ' ')

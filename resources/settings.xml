@@ -21,6 +21,7 @@
         <setting default="false" id="plugin_movie4k_to" label="Movie4k.to" type="bool" />
         <setting default="false" id="plugin_stream_oase_tv" label="Stream-Oase.tv" type="bool" />
         <setting default="false" id="plugin_megatv_to" label="MegaTV.to" type="bool" />
+        <setting default="false" id="plugin_kkiste_to" label="KKiste.to" type="bool" />
         <setting type="sep" />
     </category>
     <category label="Views">
