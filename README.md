@@ -16,3 +16,6 @@ xStream is a xbmc plugin to watch streams from various german film, trailer, mus
 * Download [repository](https://content.wuala.com/contents/Lynx187/xStream/repository.xstream/repository.xstream.zip/?dl=1) file
 * Install it as a xbmc addon
 * Install xstream addon from xstream repository
+
+## Support
+* Visit: http://xbmc.de
