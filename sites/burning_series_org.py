@@ -9,18 +9,6 @@ from resources.lib.config import cConfig
 from resources.lib import logger
 import string
 
-
-# Prüfen ob der metahandler verwendet werden soll, dieser liefert Metainformationen (Poster, Fanarts,...)
-if cConfig().getSetting('metahandler')=='true':
-    META = True
-    try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
-    except:
-        META = False
-        logger.info("Could not import package 'metahandler'")
-else:
-    META = False
     
 # Variablen definieren die "global" verwendet werden sollen
 SITE_IDENTIFIER = 'burning_series_org'
@@ -42,30 +30,7 @@ def load():
     oGui.addFolder(cGuiElement('Suche', SITE_IDENTIFIER, 'showSearch'))
     # Ende des Menus    
     oGui.setEndOfDirectory()
-  
-def __createMenuEntry(oGui, sFunction, sLabel, lParams, sMetaTitle='', iTotal = 0):
-  '''
-  Vereinfachung der Erzeugung eines Menueintrags. Setzt automatisch den obligatorischen Parameter 'site'
-  und fügt, falls der metahandler aktiv ist, Metainformation hinzu.
-  '''
-  oParams = ParameterHandler()
-  try:
-    for param in lParams:
-      oParams.setParam(param[0], param[1])
-  except Exception, e:
-    logger.error("Can't add parameter to menu entry with label: %s: %s" % (sLabel, e))
-    oParams = ""
-
-  # Create the gui element
-  oGuiElement = cGuiElement(sLabel, SITE_IDENTIFIER, sFunction)
-  if META == True and sMetaTitle != '':
-    oMetaget = metahandlers.MetaData()
-    meta = oMetaget.get_meta('tvshow', sMetaTitle)
-    oGuiElement.setItemValues(meta)
-    oGuiElement.setThumbnail(meta['cover_url'])
-    oGuiElement.setFanart(meta['backdrop_url'])
-    oParams.setParam('imdbID', meta['imdb_id'])
-  oGui.addFolder(oGuiElement, oParams, iTotal = iTotal)
+ 
 
 def showSearch():
     oGui = cGui()
@@ -92,10 +57,13 @@ def _search(oGui, sSearchText):
     aResult = oParser.parse(sHtmlContent, sPattern, ignoreCase = True)
     if not aResult[0]:
         return
+    total = len(aResult[1])
     for aEntry in aResult[1]:
-        sTitle = cUtil().unescape(aEntry[1])                             
-        __createMenuEntry(oGui, 'showSeasons', sTitle,
-            [['siteUrl', URL_MAIN + '/' + str(aEntry[0])],['Title', sTitle]], sTitle, len(aResult[1]))
+        sTitle = cUtil().unescape(aEntry[1].decode('utf-8')).encode('utf-8')
+        guiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'showSeasons')
+        guiElement.setMediaType('tvshow')              
+        params.addParams({'siteUrl' : URL_MAIN + '/' + str(aEntry[0]), 'Title' : sTitle})
+        oGui.addFolder(guiElement, params, iTotal = total)
 
 def showCharacters():
     oGui = cGui()
@@ -120,8 +88,6 @@ def showSeries():
     oRequestHandler.addHeaderEntry('Referer', 'http://burning-seri.es/')
     sHtmlContent = oRequestHandler.request();
     sChar = oParams.getValue('char')
-    if sChar and sChar == '#':
-        import string
 
     sPattern = "<ul id='serSeries'>(.*?)</ul>"
     oParser = cParser()
@@ -139,10 +105,13 @@ def showSeries():
         oParser = cParser()
         aResult = oParser.parse(sHtmlContent, sPattern)
         if aResult[0]:
-             for aEntry in aResult[1]:
-                sTitle = cUtil().unescape(aEntry[1].decode('utf-8')).encode('utf-8')                             
-                __createMenuEntry(oGui, 'showSeasons', sTitle,
-                  [['siteUrl', URL_MAIN + '/' + str(aEntry[0])],['Title', sTitle]], sTitle, len(aResult[1]))
+            total = len(aResult[1])
+            for aEntry in aResult[1]:
+                sTitle = cUtil().unescape(aEntry[1].decode('utf-8')).encode('utf-8')
+                guiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'showSeasons')
+                guiElement.setMediaType('tvshow')              
+                oParams.addParams({'siteUrl' : URL_MAIN + '/' + str(aEntry[0]), 'Title' : sTitle})
+                oGui.addFolder(guiElement, oParams, iTotal = total)
 
     oGui.setView('tvshows')
     oGui.setEndOfDirectory()
@@ -151,10 +120,10 @@ def showSeries():
 def showSeasons():
     oGui = cGui()
 	
-    oInputParameterHandler = ParameterHandler()
-    sTitle = oInputParameterHandler.getValue('Title')
-    sUrl = oInputParameterHandler.getValue('siteUrl')
-    sImdb = oInputParameterHandler.getValue('imdbID')
+    params = ParameterHandler()
+    sTitle = params.getValue('Title')
+    sUrl = params.getValue('siteUrl')
+    sImdb = params.getValue('imdbID')
     
     logger.info("%s: show seasons of '%s' " % (SITE_NAME, sTitle))
     
@@ -172,27 +141,18 @@ def showSeasons():
         oParser = cParser()
         aResult = oParser.parse(sHtmlContent, sPattern)
         if (aResult[0] == True):
-             seasonNums = []
-             for aEntry in aResult[1]:
-                seasonNums.append(str(aEntry[1]))
-                if META == True and sImdb:
-                    oMetaget = metahandlers.MetaData()
-                    meta = oMetaget.get_seasons(sTitle, sImdb, seasonNums)
-             ii=0
-             for aEntry in aResult[1]:
-                seasonNum = seasonNums[ii]
+            total = len(aResult[1])
+            for aEntry in aResult[1]:
+                seasonNum = str(aEntry[1])
                 oGuiElement = cGuiElement('Staffel ' + seasonNum, SITE_IDENTIFIER, 'showEpisodes')
-                if META == True and sImdb:
-                    meta[ii]['TVShowTitle'] = sTitle
-                    oGuiElement.setItemValues(meta[ii])
-                    oGuiElement.setThumbnail(meta[ii]['cover_url'])
-                    oGuiElement.setFanart(meta[ii]['backdrop_url'])
+                oGuiElement.setMediaType('season')
+                oGuiElement.setSeason(seasonNum)
+                oGuiElement.setTVShowTitle(sTitle)
                 oParams = ParameterHandler()
                 oParams.setParam('siteUrl', URL_MAIN + '/' + str(aEntry[0]))
                 oParams.setParam('Title', sTitle)
                 oParams.setParam('Season', seasonNum)
-                oGui.addFolder(oGuiElement, oParams, iTotal = len(aResult[1]))
-                ii+=1
+                oGui.addFolder(oGuiElement, oParams, iTotal = total)
     oGui.setView('seasons')
     oGui.setEndOfDirectory()
 
@@ -217,19 +177,16 @@ def showEpisodes():
         sPattern = '<td>([^<]+)</td>\s*<td><a href="([^"]+)">(.*?)</a>.*?<td class="nowrap">(\s*<a|\s*</td).*?</tr>'
         aResult = oParser.parse(sHtmlContent, sPattern)
         if (aResult[0] == True):
-             for aEntry in aResult[1]:
+            total = len(aResult[1])
+            for aEntry in aResult[1]:
                 if aEntry[3].strip() == '</td':
                     continue
                 sNumber = str(aEntry[0]).strip()
                 oGuiElement = cGuiElement('Episode ' + sNumber, SITE_IDENTIFIER, 'showHosters')
-                if META == True and sImdb:
-                    oMetaget = metahandlers.MetaData()
-                    meta = oMetaget.get_episode_meta(sShowTitle, sImdb, sSeason, sNumber)
-                    meta['TVShowTitle'] = sShowTitle
-                    del meta['title']
-                    oGuiElement.setItemValues(meta)
-                    oGuiElement.setThumbnail(meta['cover_url'])
-                    oGuiElement.setFanart(meta['backdrop_url'])
+                oGuiElement.setMediaType('episode')
+                oGuiElement.setSeason(sSeason)
+                oGuiElement.setEpisode(sNumber)
+                oGuiElement.setTVShowTitle(sShowTitle)
 
                 sPattern = '<strong>(.*?)</strong>'
                 aResultTitle = oParser.parse(str(aEntry[2]), sPattern)
@@ -252,7 +209,7 @@ def showEpisodes():
                 oParams.setParam('EpisodeNr', sNumber)
                 oParams.setParam('TvShowTitle', sShowTitle)
                 oParams.setParam('Title', sTitleName)
-                oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = len(aResult[1]))
+                oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
   
     oGui.setView('episodes')
     oGui.setEndOfDirectory()
@@ -314,11 +271,12 @@ def __getMovieTitle(sHtmlContent):
 	    return str(aEntry[0]).strip() + ' - ' + str(aEntry[1]).strip()
     return ''
 
-def getHosterUrl(sUrl):
+def getHosterUrl(sUrl = False):
     oParams = ParameterHandler()
     sTitle = oParams.getValue('Title')
     sHoster = oParams.getValue('Hoster')
-   
+    if not sUrl:
+        sUrl = oParams.getValue('url')
     oRequestHandler = cRequestHandler(sUrl)
     sHtmlContent = oRequestHandler.request();
 	

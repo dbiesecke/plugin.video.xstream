@@ -1,4 +1,5 @@
 from resources.lib.gui.gui import cGui
+from resources.lib.config import cConfig
 import urllib2
 import xbmc
 import xbmcgui
@@ -26,10 +27,12 @@ class cDownload:
         oGui = cGui()
         self.__sTitle = oGui.showKeyBoard(self.__sTitle)
         if (self.__sTitle != False and len(self.__sTitle) > 0):
+            sPath = cConfig().getSetting('download-folder')
 
-            dialog = xbmcgui.Dialog()
-            sPath = dialog.browse(3, 'Downloadfolder', 'files', '')
-            
+            if sPath == '':
+                dialog = xbmcgui.Dialog()
+                sPath = dialog.browse(3, 'Downloadfolder', 'files', '')
+
             if (sPath != ''):                
                 sDownloadPath = xbmc.translatePath(sPath +  '%s' % (self.__sTitle, ))
                 #print sDownloadPath
@@ -44,6 +47,7 @@ class cDownload:
 
     def __download(self, oUrlHandler, fpath):
         headers = oUrlHandler.info()
+        #print headers
 
         iTotalSize = -1
         if "content-length" in headers:

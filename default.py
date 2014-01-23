@@ -5,10 +5,10 @@ from os.path import join
 from sys import path
 from xbmc import translatePath
 from xbmc import log
-import xbmcaddon
+from resources.lib import common
 
-__settings__ = xbmcaddon.Addon(id='plugin.video.xstream')
-__cwd__ = __settings__.getAddonInfo('path')
+__settings__ = common.addon
+__cwd__ = common.addonPath
 
 # Add different library path
 path.append(translatePath(join(__cwd__, "resources", "lib")))

@@ -1,22 +1,10 @@
 import sys
 import os
-import xbmcaddon
 import logger
 from resources.lib.config import cConfig
+from resources.lib import common
 
 class cPluginHandler:
-
-    def getPluginHandle(self):
-        try:
-            return int( sys.argv[ 1 ] )
-        except:
-            return 0
-
-    def getPluginPath(self):
-        try:
-            return sys.argv[0]
-        except:
-            return ''
 
     def __getFileNamesFromFolder(self, sFolder):
         aNameList = []
@@ -41,15 +29,10 @@ class cPluginHandler:
         except:
             return True, sSiteName, sPluginSettingsName, ''
 
-    def getRootFolder(self):
-        sRootFolder = xbmcaddon.Addon(id='plugin.video.xstream').getAddonInfo('path')
-        logger.info('root folder: ' + sRootFolder)
-        return sRootFolder
-
     def getAvailablePlugins(self):
         oConfig = cConfig()
 
-        sFolder =  self.getRootFolder()
+        sFolder =  common.addonPath
         sIconFolder = os.path.join(sFolder, 'resources','art','sites')
         sFolder = os.path.join(sFolder, 'sites')
 

@@ -3,10 +3,8 @@ from resources.lib.parser import cParser
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.gui.gui import cGui
-from resources.lib.gui.hoster import cHosterGui
-from resources.lib.handler.hosterHandler import cHosterHandler
 from resources.lib.util import cUtil
-from ParameterHandler import *
+from resources.lib.handler.ParameterHandler import ParameterHandler
 
 SITE_IDENTIFIER = 'bundesliga_de'
 SITE_NAME = 'Bundesliga.de'
@@ -38,14 +36,14 @@ def __createMainMenuItem(oGui, sTitle, sPlaylistId):
 def listVideos():
     oGui = cGui()
 
-    oInputParameterHandler = ParameterHandler()
-    if (oInputParameterHandler.exist('playlistId')):
-        sPlaylistId = oInputParameterHandler.getValue('playlistId')
+    params = ParameterHandler()
+    if (params.exist('playlistId')):
+        sPlaylistId = params.getValue('playlistId')
 
-        if not oInputParameterHandler.exist('sUrl'):
+        if not params.exist('sUrl'):
             sUrl = URL_TV + str(sPlaylistId)
         else:
-            sUrl = oInputParameterHandler.getValue('sUrl')
+            sUrl = params.getValue('sUrl')
         
 
         if sPlaylistId == 'spieltag':
@@ -146,10 +144,10 @@ def listVideos():
     oGui.setEndOfDirectory()
 
 def play():
-    oInputParameterHandler = ParameterHandler()
-    if (oInputParameterHandler.exist('sUrl') and oInputParameterHandler.exist('sTitle')):
-        sUrl = oInputParameterHandler.getValue('sUrl')
-        sTitle = oInputParameterHandler.getValue('sTitle')
+    params = ParameterHandler()
+    if (params.exist('sUrl') and params.exist('sTitle')):
+        sUrl = params.getValue('sUrl')
+        sTitle = params.getValue('sTitle')
         
         oRequest = cRequestHandler(sUrl)
         sHtmlContent = oRequest.request()

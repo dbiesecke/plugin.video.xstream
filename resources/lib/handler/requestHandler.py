@@ -5,11 +5,12 @@ import urllib2
 from resources.lib import mechanize
 import xbmc
 import xbmcgui
-import xbmcaddon
-import logger
+
 import hashlib
 import time
 from resources.lib.config import cConfig
+from resources.lib import common
+from resources.lib import logger
 
 class cRequestHandler:
     REQUEST_TYPE_GET = 0
@@ -79,14 +80,7 @@ class cRequestHandler:
         except Exception as e:
             logger.info(e)
         sParameters = urllib.urlencode(self.__aParameters)
-        #if (self.__cType == cRequestHandler.REQUEST_TYPE_GET):
-        #    if (len(sParameters) > 0):
-        #        if (self.__sUrl.find('?') == -1):
-        #            self.__sUrl = self.__sUrl + '?' + str(sParameters)
-        #            sParameters = ''
-        #        else:
-        #            self.__sUrl = self.__sUrl + '&' + str(sParameters)
-        #            sParameters = ''
+
         opener = mechanize.build_opener(SmartRedirectHandler)
         if (len(sParameters) > 0):
             oRequest = mechanize.Request(self.__sUrl, sParameters)
@@ -103,7 +97,6 @@ class cRequestHandler:
             if sContent:
                 return sContent
         try:
-            #oResponse = mechanize.urlopen(oRequest,timeout = 60)
             oResponse = opener.open(oRequest,timeout = 60)             
         except urllib2.HTTPError, e:
             if not self.ignoreErrors:
@@ -164,7 +157,7 @@ class cRequestHandler:
         return opened.geturl()
 
     def __setCookiePath(self):
-        profilePath = xbmcaddon.Addon(id='plugin.video.xstream').getAddonInfo('profile')
+        profilePath = common.profilePath
         cookieFile = os.path.join(xbmc.translatePath(profilePath),'cookies.txt')
         if not os.path.exists(cookieFile):
             file = open(cookieFile, 'w')
@@ -174,7 +167,7 @@ class cRequestHandler:
     ###Caching
     def setCachePath(self, cache=''):
         if not cache:
-            profilePath = xbmcaddon.Addon(id='plugin.video.xstream').getAddonInfo('profile')
+            profilePath = common.profilePath
             cache = os.path.join(xbmc.translatePath(profilePath),'htmlcache')
         if not os.path.exists(cache):
             os.makedirs(cache)
@@ -211,6 +204,13 @@ class cRequestHandler:
             return 0
         return fileAge
 
+    def clearCache(self):
+        files = os.listdir(self.__cachePath)
+        for file in files:
+            cacheFile = os.path.join(self.__cachePath, file)
+            fileAge = self.getFileAge(cacheFile)
+            if fileAge > self.cacheTime:
+                os.remove(cacheFile)
 
 # get more control over redirect (extract further cookies) 
 class SmartRedirectHandler(mechanize.HTTPRedirectHandler):     

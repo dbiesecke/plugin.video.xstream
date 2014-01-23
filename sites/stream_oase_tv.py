@@ -10,18 +10,6 @@ import logger
 from ParameterHandler import *
 from resources.lib.config import cConfig
 
-
-
-if cConfig().getSetting('metahandler')=='true':
-    META = True
-    try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
-    except:
-        META = False
-        logger.info("Could not import package 'metahandler'")
-else:
-    META = False
     
 SITE_IDENTIFIER = 'stream_oase_tv'
 SITE_NAME = 'Stream-Oase.tv'
@@ -40,7 +28,7 @@ def load():
 def showMovies():
     oParams = ParameterHandler()
     if oParams.getValue('siteUrl'):
-        sUrl = URL_MAIN+oParams.getValue('siteUrl')     
+        sUrl = URL_MAIN + oParams.getValue('siteUrl')     
     else:
         return  
     oGui = cGui()    
@@ -58,9 +46,9 @@ def showMovies():
     # check for next site
     aResult = oParser.parse(sHtmlContent, 'href="([^"]+)" title="Weiter"')
     if aResult[0]:
+        oParams = ParameterHandler()
         oParams.setParam('siteUrl',aResult[1][0])
-        oGuiElement = cGuiElement(' Next page ...', SITE_IDENTIFIER, 'showMovies')
-        oGui.addFolder(oGuiElement, oParams)
+        oGui.addNextPage(SITE_IDENTIFIER, 'showMovies', oParams)
     oGui.setView('movies')
     oGui.setEndOfDirectory()
 
@@ -93,35 +81,7 @@ def showGenres():
         oGuiElement = cGuiElement(sLabel, SITE_IDENTIFIER, sFunction)
         oGui.addFolder(oGuiElement, oParams, iTotal = iTotal+1)
     oGui.setEndOfDirectory()
-    
-    
-def getHosters():
-    oParams = ParameterHandler()
-    sTitle = oParams.getValue('Title')
-    sUrl = oParams.getValue('siteUrl')   
-    
-    logger.info("%s: hosters for movie '%s' " % (SITE_IDENTIFIER, sTitle)) 
-    
-    oRequestHandler = cRequestHandler(URL_MAIN+sUrl)
-    sHtmlContent = oRequestHandler.request();
 
-    sPattern = '<iframe src="([^"]+)"'
-    oParser = cParser()
-    aResult = oParser.parse(sHtmlContent.lower(), sPattern)
-    hosters = []
-    sFunction='getHosterUrl'
-    if (aResult[0] == True):
-        for aEntry in aResult[1]:
-            hoster = {}
-            hoster['link'] = aEntry
-            # extract domain name
-            temp = aEntry.split('//')
-            temp = str(temp[-1]).split('/')
-            temp = str(temp[0]).split('.')
-            hoster['name'] = temp[-2]
-            hosters.append(hoster)
-    hosters.append(sFunction)
-    return hosters
     
 def showSearch():
     oGui = cGui()
@@ -160,21 +120,18 @@ def __parseMovieList(oGui, sHtml, oParams = False):
     sFunction = 'getHosters'
     iTotal = len(aResult[1])
     for aEntry in aResult[1]:
-        sLabel = aEntry[2].strip()
+        sLabel = aEntry[2].split('(')
+        sTitle = sLabel[0].strip()
         sNextUrl = aEntry[0]
         sThumb = aEntry[1] 
         oParams.setParam('siteUrl',sNextUrl)
-        oParams.setParam('Title', sLabel)
-        oGuiElement = cGuiElement(sLabel, SITE_IDENTIFIER, sFunction)
+        oParams.setParam('Title', sTitle)
+        oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, sFunction)
         oGuiElement.setThumbnail(sThumb)
-        if META:
-            oMetaget = metahandlers.MetaData()
-            meta = oMetaget.get_meta('movie', sLabel)
-            oGuiElement.setItemValues(meta)
-            if not meta['cover_url'] == '':
-                oGuiElement.setThumbnail(meta['cover_url'])
-            if not meta['backdrop_url'] == '':
-                oGuiElement.setFanart(meta['backdrop_url'])
+        oGuiElement.setMediaType('movie')
+        if len(sLabel)>1:
+            year = sLabel[-1].replace(')','')
+            oGuiElement.setYear(year)
         oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = iTotal)
                 
  
@@ -195,6 +152,35 @@ def __createInfo(oGui, sHtmlContent, sTitle):
 
 def dummyFolder():
     return
+
+
+def getHosters():
+    oParams = ParameterHandler()
+    sTitle = oParams.getValue('Title')
+    sUrl = oParams.getValue('siteUrl')   
+    
+    logger.info("%s: hosters for movie '%s' " % (SITE_IDENTIFIER, sTitle)) 
+    
+    oRequestHandler = cRequestHandler(URL_MAIN+sUrl)
+    sHtmlContent = oRequestHandler.request();
+
+    sPattern = '<iframe src="([^"]+)"'
+    oParser = cParser()
+    aResult = oParser.parse(sHtmlContent.lower(), sPattern)
+    hosters = []
+    sFunction='getHosterUrl'
+    if (aResult[0] == True):
+        for aEntry in aResult[1]:
+            hoster = {}
+            hoster['link'] = aEntry
+            # extract domain name
+            temp = aEntry.split('//')
+            temp = str(temp[-1]).split('/')
+            temp = str(temp[0]).split('.')
+            hoster['name'] = temp[-2]
+            hosters.append(hoster)
+    hosters.append(sFunction)
+    return hosters
             
 
 def getHosterUrl(sStreamUrl):

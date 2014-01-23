@@ -1,6 +1,7 @@
 import sys
 import xbmc
 import xbmcplugin
+from resources.lib import common
 
 class cConfig:
 
@@ -16,15 +17,13 @@ class cConfig:
 
         if (self.__bIsDharma):
             import xbmcaddon
-            self.__oSettings = xbmcaddon.Addon(self.getPluginId())
+            self.__oSettings = xbmcaddon.Addon(common.addonID)
             self.__aLanguage = self.__oSettings.getLocalizedString
 
 
     def isDharma(self):
         return self.__bIsDharma
         
-    def getPluginId(self):
-        return 'plugin.video.xstream'
 
     def showSettingsWindow(self):
         if (self.__bIsDharma):

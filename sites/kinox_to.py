@@ -6,12 +6,7 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib.util import cUtil
-from resources.lib.gui.hoster import cHosterGui
-from resources.lib.handler.hosterHandler import cHosterHandler
 from resources.lib.config import cConfig
-from xbmc import log
-from xbmc import LOGDEBUG
-from xbmc import LOGERROR
 from json import loads
 import re
 from resources.lib.handler.ParameterHandler import ParameterHandler
@@ -40,17 +35,6 @@ URL_MIRROR = 'http://kinox.to/aGET/Mirror/'
 URL_EPISODE_URL = 'http://kinox.to/aGET/MirrorByEpisode/'
 URL_AJAX = 'http://kinox.to/aGET/List/'
 URL_LANGUAGE = 'http://kinox.to/aSET/PageLang/1'
-
-if cConfig().getSetting('metahandler')=='true':
-    META = True
-    try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
-    except:
-        META = False
-        logger.info("Could not import package 'metahandler'")
-else:
-    META = False
 
 
 def load():
@@ -112,7 +96,7 @@ def showMovieMenu():
     oGui.addFolder(cGuiElement('A-Z',SITE_IDENTIFIER,'showCharacters'),oParams)
     oGui.addFolder(cGuiElement('Genres',SITE_IDENTIFIER,'showGenres'),oParams)
     oParams.setParam('sUrl', URL_FAVOURITE_MOVIE_PAGE)
-    oGui.addFolder(cGuiElement('Beliebteste Filme',SITE_IDENTIFIER,'showFavItems'),oParams)
+    oGui.addFolder(cGuiElement('Beliebteste Filme', SITE_IDENTIFIER, 'showFavItems'),oParams)
     oGui.setEndOfDirectory()
     
 def showSeriesMenu():
@@ -149,6 +133,39 @@ def __createTitleWithLanguage(sLanguage, sTitle):
         return sTitle + " (tu)"
 
     return sTitle
+
+def __createLanguage(sLangID):
+        if sLangID == "1":
+            return 'de'
+        elif sLangID == "2" or sLangID == "15":
+            return 'en'
+        elif sLangID == "7":
+            return 'tu'
+        elif sLangID == "4":
+            return 'ch'
+        elif sLangID == "5":
+            return 'sp'
+        elif sLangID == "6":
+            return 'fr'
+        elif sLangID == "8":
+            return 'jp'
+        elif sLangID == '11':
+            return 'it'
+        elif sLangID == "16":
+            return 'nl'
+        return sLangID
+
+def __checkSubLanguage(sTitle):
+        if not ' subbed*' in sTitle:
+            return [sTitle, '']
+        temp = sTitle.split(' *')            
+        subLang = temp[-1].split('subbed*')[0].strip()
+        title = ' '.join(temp[0:-1]).strip()
+        if subLang == 'german':
+            return [title, 'de']
+        else:
+            return [title, subLang] 
+
 
 def __getHtmlContent(sUrl = None, sSecurityValue = None):
     oParams = ParameterHandler()
@@ -266,9 +283,11 @@ def __displayItems(oGui, sHtmlContent):
     oParams = ParameterHandler()
     if oParams.exist("securityCookie"):
         sSecurityValue = oParams.getValue("securityCookie")
+
     # The pattern to filter every item of the list
     sPattern = '<td class="Icon"><img width="16" height="11" src="/gr/sys/lng/(\d+).png" alt="language"></td>'+\
-    '.*?title="([^\"]+)".*?<td class="Title">.*?<a href="([^\"]+)" onclick="return false;">([^<]+)</a>'
+    '.*?title="([^\"]+)".*?<td class="Title">.*?<a href="([^\"]+)" onclick="return false;">([^<]+)</a> <span class="Year">([0-9]+)</span>'
+
     # Parse to get all items of the list
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
@@ -276,20 +295,36 @@ def __displayItems(oGui, sHtmlContent):
         logger.error("Could not find an item")
         return
     # Go throught all items and create a gui element for them.
+    total = len(aResult[1])
     for aEntry in aResult[1]:
-        sTitle = __createTitleWithLanguage(aEntry[0], aEntry[3])
-        sUrl = URL_MAIN + aEntry[2]  
+        sTitle = cUtil().unescape(aEntry[3])
+        # split title and subtitle language
+        sTitle, subLang = __checkSubLanguage(sTitle)
+        # get audio language
+        sLang = __createLanguage(aEntry[0])
+        sUrl = URL_MAIN + aEntry[2]
+        mediaType = ''
         if aEntry[1] == 'movie' or aEntry[1] == 'cinema':
             mediaType = 'movie'
-        else: 
-            mediaType = aEntry[1]
+        elif aEntry[1] == 'series': 
+            mediaType = 'series'
+        else:
+            mediaType = 'documentation'
+
         oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
+        oGuiElement.setLanguage(sLang)
+        oGuiElement.setSubLanguage(subLang)
+        oGuiElement.setYear(aEntry[4])
         oParams.setParam('sUrl',sUrl)
         oParams.setParam('mediaType',mediaType)
         if mediaType == 'series':
-            oGui.addFolder(oGuiElement,oParams)
+            oGuiElement.setMediaType('tvshow')
+            oGui.addFolder(oGuiElement, oParams, iTotal = total)
+        elif mediaType == 'movie':
+            oGuiElement.setMediaType('movie')
+            oGui.addFolder(oGuiElement,oParams,bIsFolder=False, iTotal = total)
         else:
-            oGui.addFolder(oGuiElement,oParams,bIsFolder=False)
+            oGui.addFolder(oGuiElement,oParams,bIsFolder=False, iTotal = total)
 
     
 def showFavItems():
@@ -345,40 +380,41 @@ def parseNews():
         oGui.setEndOfDirectory()
         return
     sPattern = '<td class="Icon"><img src="/gr/sys/lng/(\d+).png" alt="language" width="16" '+\
-    'height="11".*?<td class="Title">.*?href="([^\"]+)".*?class="OverlayLabel">([^<]+)'+\
-    '(<span class="EpisodeDescr">)?([^><]+)'
+    'height="11".*?<td class="Title">.*?href="([^\"]+)".*?class="OverlayLabel">([^<]+)<'+\
+    '(span class="EpisodeDescr">)?([^<]+)'
     oParser = cParser()
     aResult = oParser.parse(aResult[1][0], sPattern)
     if not aResult[0]:
         logger.info("Can't get any news")
         oGui.setEndOfDirectory()
         return
+    total = len(aResult[1])
     # Create an entry for every news line
     for aEntry in aResult[1]:
-        sTitle = __createTitleWithLanguage(aEntry[0], aEntry[2] + aEntry[4])
+        print aEntry
+        sLang = __createLanguage(aEntry[0])
+        sTitle = cUtil().unescape(aEntry[2]).strip()
+        if sTitle.endswith(':'):
+            sTitle = sTitle[:-1]
+        sTitle, subLang = __checkSubLanguage(sTitle)
         sUrl = aEntry[1]
         # If there are several urls, just pick the first one
         aUrl = sUrl.split(",")
         if len(aUrl) > 0:
             sUrl = aUrl[0]
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER,'parseMovieEntrySite')
-            if META and not mediaType == 'documentation':
-                oMetaget = metahandlers.MetaData()
-                if mediaType == 'movie':
-                    meta = oMetaget.get_meta('movie', sTitle.split('(')[0].split('*')[0])
-                else:
-                    meta = oMetaget.get_meta('tvshow', sTitle.split('(')[0].split('*')[0].split(':')[0]) 
-                oGuiElement.setItemValues(meta)
-                oGuiElement.setThumbnail(meta['cover_url'])
-                oGuiElement.setFanart(meta['backdrop_url'])
-                oParams.setParam('imdbID', meta['imdb_id'])
+            oGuiElement.setLanguage(sLang)
+            oGuiElement.setSubLanguage(subLang)
+
             oParams.setParam('sUrl',URL_MAIN + sUrl)
             oParams.setParam('mediaType',mediaType)
             if mediaType == 'series':
-                oGui.addFolder(oGuiElement, oParams)
+                oGuiElement.setMediaType('tvshow')
+                oGui.addFolder(oGuiElement, oParams, iTotal = total)
                 oGui.setView('tvshows')
             else:
-                oGui.addFolder(oGuiElement, oParams, bIsFolder = False)
+                oGuiElement.setMediaType('movie')
+                oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
                 oGui.setView('movies')
     oGui.setEndOfDirectory()
 
@@ -454,6 +490,7 @@ def _cinema(oGui):
     aResult = oParser.parse(sHtmlContent, sPattern)
     # iterate result and create GuiElements
     if (aResult[0] == True):
+        total = len(aResult[1])
         for aEntry in aResult[1]:
             sMovieTitle = aEntry[0]
             lang = aEntry[4]
@@ -463,18 +500,19 @@ def _cinema(oGui):
             oGuiElement.setFunction('parseMovieEntrySite')
             oGuiElement.setTitle(__createTitleWithLanguage(lang, sMovieTitle))
             oGuiElement.setDescription(aEntry[3])
-            if META:
-                oMetaget = metahandlers.MetaData()
-                meta = oMetaget.get_meta('movie', sMovieTitle)
-                oGuiElement.setItemValues(meta)
-                oGuiElement.setThumbnail(meta['cover_url'])
-                oGuiElement.setFanart(meta['backdrop_url'])
-                oParams.setParam('imdbID', meta['imdb_id'])
-            if META == False or oGuiElement.getThumbnail() == '':
-                oGuiElement.setThumbnail(aEntry[2])
-                oGuiElement.addItemValue('rating',rating)
+            oGuiElement.setMediaType('movie')
+            oGuiElement.setThumbnail(aEntry[2])
+            oGuiElement.addItemValue('rating',rating)
+            #if META:
+            #    oMetaget = metahandlers.MetaData()
+            #    meta = oMetaget.get_meta('movie', sMovieTitle)
+            #    oGuiElement.setItemValues(meta)
+            #    oGuiElement.setThumbnail(meta['cover_url'])
+            #    oGuiElement.setFanart(meta['backdrop_url'])
+            #    oParams.setParam('imdbID', meta['imdb_id'])
+
             oParams.setParam('sUrl', URL_MAIN + str(aEntry[1]))
-            oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = len(aResult[1]))
+            oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
 
 def parseMovieEntrySite():
     oParams = ParameterHandler()
@@ -494,14 +532,15 @@ def parseMovieEntrySite():
                 for item in aSeriesItems:
                     oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
                     sShowTitle = sMovieTitle.split('(')[0].split('*')[0]
-                    if META and imdbID:
-                        oMetaget = metahandlers.MetaData()
-                        meta = oMetaget.get_episode_meta(sShowTitle, imdbID, item['season'], item['episode'])
-                        meta['TVShowTitle'] = sShowTitle
-                        oGuiElement.setItemValues(meta)
-                        oGuiElement.setThumbnail(meta['cover_url'])
-                        oGuiElement.setFanart(meta['backdrop_url'])
-                        oGuiElement.setTitle('%s %s' % (item['title'], meta['title'].encode('utf-8')))
+                    oGuiElement.setMediaType('episode')
+                    #if META and imdbID:
+                    #    oMetaget = metahandlers.MetaData()
+                    #    meta = oMetaget.get_episode_meta(sShowTitle, imdbID, item['season'], item['episode'])
+                    #    meta['TVShowTitle'] = sShowTitle
+                    #    oGuiElement.setItemValues(meta)
+                    #    oGuiElement.setThumbnail(meta['cover_url'])
+                    #    oGuiElement.setFanart(meta['backdrop_url'])
+                    #    oGuiElement.setTitle('%s %s' % (item['title'], meta['title'].encode('utf-8')))
                     oParams.addParams({'sUrl':item['url'], 'episode':item['episode'], 'season':item['season'], 'TvShowTitle':sShowTitle})
                     oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = len(aSeriesItems))
             oGui.setView('episodes')
@@ -536,6 +575,7 @@ def __createInfoItem(oGui, sHtmlContent):
   oOutputParameterHandler.setParam('sDescription', sDescription)
 
   oGui.addFolder(oGuiElement, oOutputParameterHandler)
+
 
 def dummyFolder():
   oGui = cGui()
@@ -572,6 +612,7 @@ def parseSerieSite(sHtmlContent):
           aSeriesItems.append(aSeries)
   return aSeriesItems
 
+
 def __isSerie(sHtmlContent):
   sPattern = 'id="SeasonSelection" rel="([^"]+)"'
   oParser = cParser()
@@ -585,6 +626,7 @@ def __isSerie(sHtmlContent):
 
 def ajaxCall():
     oGui = cGui()
+    metaOn = oGui.isMetaOn
     oParams = ParameterHandler()
     sSecurityValue = oParams.getValue('securityCookie')
 
@@ -600,10 +642,10 @@ def ajaxCall():
 
     logger.info('MediaType: ' + sMediaType + ' , Page: ' + str(iPage) + ' , iMediaTypePageId: ' + str(iMediaTypePageId) + ' , sCharacter: ' + str(sCharacter))
 
-    sHtmlContent = __getAjaxContent(sMediaType, iPage, iMediaTypePageId, sCharacter)
+    sHtmlContent = __getAjaxContent(sMediaType, iPage, iMediaTypePageId, metaOn, sCharacter)
     if not sHtmlContent:
         return
-    if META and not sMediaType == 'documentation': 
+    if metaOn and not sMediaType == 'documentation': 
         aData = loads(sHtmlContent)['aaData']
         total = len(aData)
         oParser = cParser()
@@ -616,22 +658,13 @@ def ajaxCall():
                 sLang = aEntry[0]
                 sUrl = URL_MAIN + str(aResult[1][0][0])
                 sUrl = sUrl.replace('\\', '')
-                oGuiElement = cGuiElement(__createTitleWithLanguage(sLang, sTitle),SITE_IDENTIFIER,'parseMovieEntrySite')
-                oGuiElement.addItemValue('year',sYear)
-                #oGuiElement.setLanguage(sLang)
-                if META:
-                    oMetaget = metahandlers.MetaData()
-                    if sMediaType == 'series':
-                        meta = oMetaget.get_meta('tvshow', sTitle.split('*')[0])
-                    else:
-                        meta = oMetaget.get_meta('movie', sTitle.split('*')[0], year = sYear)
-                    oGuiElement.setItemValues(meta)
-                    oGuiElement.setThumbnail(meta['cover_url'])
-                    oGuiElement.setFanart(meta['backdrop_url'])
-                    oParams.setParam('imdbID', meta['imdb_id'])
+                oGuiElement = cGuiElement(sTitle,SITE_IDENTIFIER,'parseMovieEntrySite')
+                oGuiElement.setYear(sYear)
+                oGuiElement.setLanguage(sLang)
+
                 oParams.setParam('sUrl', sUrl)
                 if sMediaType == 'series':
-                    oGui.addFolder(oGuiElement, oParams, iTotal = len(aResult[1]))
+                    oGui.addFolder(oGuiElement, oParams, iTotal = total)
                 else:
                     oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
 
@@ -651,8 +684,8 @@ def ajaxCall():
                     oParams.setParam('securityCookie', sSecurityValue)
                 if (iMediaTypePageId != False):
                     oParams.setParam('mediaTypePageId', iMediaTypePageId)
-                oGui.addNextPage(SITE_IDENTIFIER,'ajaxCall',oParams)
-        oGui.setView('movies')
+                oGui.addNextPage(SITE_IDENTIFIER, 'ajaxCall', oParams)
+
     else:
         aData = loads(sHtmlContent)
         sPattern = '<div class="Opt leftOpt Headlne"><a title="(.*?)" href="(.*?)">.*?src="(.*?)".*?class="Descriptor">(.*?)</div'
@@ -661,6 +694,7 @@ def ajaxCall():
         aResult = oParser.parse(aData['Content'].encode('utf-8'), sPattern)
         # iterated result and create GuiElements
         if (aResult[0] == True):
+            total = len(aResult[1])
             for aEntry in aResult[1]:
                 sMovieTitle = aEntry[0]
                 oGuiElement = cGuiElement(sMovieTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
@@ -668,9 +702,9 @@ def ajaxCall():
                 oGuiElement.setThumbnail(aEntry[2])
                 oParams.setParam('sUrl', URL_MAIN + str(aEntry[1]))
                 if sMediaType == 'series':
-                    oGui.addFolder(oGuiElement, oParams, iTotal = len(aResult[1]))
+                    oGui.addFolder(oGuiElement, oParams, iTotal = total)
                 else:
-                    oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = len(aResult[1]))
+                    oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
             #next page
             iTotalCount = int(aData['Total'])
             iNextPage = int(iPage)+1           
@@ -679,7 +713,11 @@ def ajaxCall():
                 oParams.setParam('page', iNextPage)
                 if (iMediaTypePageId != False):
                     oParams.setParam('mediaTypePageId', iMediaTypePageId)
-                oGui.addNextPage(SITE_IDENTIFIER,'ajaxCall',oParams)
+                oGui.addNextPage(SITE_IDENTIFIER, 'ajaxCall', oParams)
+
+    if sMediaType == 'series':
+        oGui.setView('tvshows')
+    else:
         oGui.setView('movies')
     oGui.setEndOfDirectory()
 
@@ -687,7 +725,8 @@ def ajaxCall():
 def __createDisplayStart(iPage):
   return (30 * int(iPage)) - 30
 
-def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, sCharacter='A'):
+
+def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, metaOn , sCharacter=''):
     iDisplayStart = __createDisplayStart(iPage)        
     oParams = ParameterHandler()
     # Test if a security value is available
@@ -707,7 +746,7 @@ def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, sCharacter='A'):
         oRequest.addParameters('additional', '{"foo":"bar","' + str(sMediaType) + '":"' + iMediaTypePageId + '","fType":"movie","fLetter":"' + str(sCharacter) + '"}')
     oRequest.addParameters('iDisplayLength', '30')
     oRequest.addParameters('iDisplayStart', iDisplayStart)
-    if META and not sMediaType == 'documentation':
+    if metaOn and not sMediaType == 'documentation':
         oRequest.addParameters('bSortable_0', 'true')
         oRequest.addParameters('bSortable_1', 'true')
         oRequest.addParameters('bSortable_2', 'true')
@@ -771,14 +810,16 @@ def showHosters(sHtmlContent = '', sTitle = False):
                 hoster['displayedName'] = sHoster+mirrorName
                 hosters.append(hoster)
     hosters.append('getHosterUrlandPlay') 
-    return hosters                        
+    return hosters
+                        
 
-def getHosterUrlandPlay(sUrl):
+def getHosterUrlandPlay(sUrl = False):
   results = []
   oParams = ParameterHandler()
   sSecurityValue = oParams.getValue('securityCookie')
   sTitle = oParams.getValue('title')
- 
+  if not sUrl:
+    sUrl = oParams.getValue('url')
   sUrl = sUrl.replace('&amp;', '&')
   oRequest = cRequestHandler(sUrl)
   oRequest.addHeaderEntry('Cookie', sSecurityValue)
@@ -823,6 +864,7 @@ def getHosterUrlandPlay(sUrl):
         result['resolved'] = False
         results.append(result)
   return results
+
   
 # Metainformations on Moviepage
 def __getDescription(sHtmlContent):
@@ -834,6 +876,7 @@ def __getDescription(sHtmlContent):
 
   return ''
 
+
 def __getThumbnail(sHtmlContent):
   sRegex = '<div class="Grahpics">.*? src="([^"]+)"'
   oParser = cParser()
@@ -842,6 +885,7 @@ def __getThumbnail(sHtmlContent):
     return aResult[1][0]
 
   return ''
+
 
 def __getDetails(sHtmlContent):
     sRegex = '<li class="DetailDat" title="Director"><span class="Director"></span>(.*?)</li><li class="DetailDat" title="Country"><span class="Country"></span>(.*?)</li><li class="DetailDat" title="Runtime"><span class="Runtime"></span>(.*?)</li><li class="DetailDat" title="Genre"><span class="Genre"></span>(.*?)</li><li class="DetailDat" title="Views"><span class="Views"></span>(.*?)</li>'

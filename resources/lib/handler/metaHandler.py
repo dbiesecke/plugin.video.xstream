@@ -6,67 +6,70 @@ from metahandler.metahandlers import *
 
 #theTVDB
 import urllib
-import elementtree.ElementTree as ET
+try:
+    import xml.etree.ElementTree as ET 
+except ImportError:
+    import elementtree.ElementTree as ET
 from cStringIO import StringIO
 
 
 class MetaData(metahandlers.MetaData):
     """partiall reimplementation of metahandler.MetaData class"""
-    def get_meta(self, media_type, name, imdb_id='', tmdb_id='', year='', rating='', overlay=6):
-        '''
-        Main method to get meta data for movie or tvshow. Will lookup by name/year
-        if no IMDB ID supplied.
+    #def get_meta(self, media_type, name, imdb_id='', tmdb_id='', year='', rating='', overlay=6):
+    #    '''
+    #    Main method to get meta data for movie or tvshow. Will lookup by name/year
+    #    if no IMDB ID supplied.
 
-        Args:
-            media_type (str): 'movie' or 'tvshow'
-            name (str): full name of movie/tvshow you are searching
-        Kwargs:
-            imdb_id (str): IMDB ID
-            tmdb_id (str): TMDB ID
-            year (str): 4 digit year of video, recommended to include the year whenever possible
-            to maximize correct search results.
-            rating (float): IMDB or TMDB rating of the movie/tvshow, can possibly increase the search accuracy
-            overlay (int): To set the default watched status (6=unwatched, 7=watched) on new videos
+    #    Args:
+    #        media_type (str): 'movie' or 'tvshow'
+    #        name (str): full name of movie/tvshow you are searching
+    #    Kwargs:
+    #        imdb_id (str): IMDB ID
+    #        tmdb_id (str): TMDB ID
+    #        year (str): 4 digit year of video, recommended to include the year whenever possible
+    #        to maximize correct search results.
+    #        rating (float): IMDB or TMDB rating of the movie/tvshow, can possibly increase the search accuracy
+    #        overlay (int): To set the default watched status (6=unwatched, 7=watched) on new videos
 
-        Returns:
-            DICT of meta data or None if cannot be found.
-        '''
+    #    Returns:
+    #        DICT of meta data or None if cannot be found.
+    #    '''
        
-        common.addon.log('---------------------------------------------------------------------------------------', 2)
-        common.addon.log('Attempting to retreive meta data for %s: %s %s %s %s' % (media_type, name, year, imdb_id, tmdb_id), 2)
+    #    common.addon.log('---------------------------------------------------------------------------------------', 2)
+    #    common.addon.log('Attempting to retreive meta data for %s: %s %s %s %s' % (media_type, name, year, imdb_id, tmdb_id), 2)
  
-        if imdb_id:
-            imdb_id = self._valid_imdb_id(imdb_id)
+    #    if imdb_id:
+    #        imdb_id = self._valid_imdb_id(imdb_id)
         
-        if imdb_id:
-            meta = self._cache_lookup_by_id(media_type, imdb_id=imdb_id)
-        elif tmdb_id:
-            meta = self._cache_lookup_by_id(media_type, tmdb_id=tmdb_id)
-        else:
-            meta = self._cache_lookup_by_name(media_type, name, year, rating)
+    #    if imdb_id:
+    #        meta = self._cache_lookup_by_id(media_type, imdb_id=imdb_id)
+    #    elif tmdb_id:
+    #        meta = self._cache_lookup_by_id(media_type, tmdb_id=tmdb_id)
+    #    else:
+    #        meta = self._cache_lookup_by_name(media_type, name, year, rating)
 
-        if not meta:
+    #    if not meta:
 
-            if media_type==self.type_movie:
-                meta = self._get_tmdb_meta(imdb_id, tmdb_id, name, year, rating)
-            elif media_type==self.type_tvshow:
-                meta = self._get_tvdb_meta(imdb_id, name, year, rating)
+    #        if media_type==self.type_movie:
+    #            meta = self._get_tmdb_meta(imdb_id, tmdb_id, name, year, rating)
+    #        elif media_type==self.type_tvshow:
+    #            meta = self._get_tvdb_meta(imdb_id, name, year, rating)
             
-            self._cache_save_video_meta(meta, name, media_type, overlay)
-        # while updating, chache_lookup_by_id can cause problems, there are movies/tvshows in different languages an therefore different names but with the same id
-        # so we try to get meta information although we already have meta for the given id
-        elif meta['title'] != self._clean_string(name.lower()):
+    #        self._cache_save_video_meta(meta, name, media_type, overlay)
+    #    # while updating, chache_lookup_by_id can cause problems, there are movies/tvshows in different languages an therefore different names but with the same id
+    #    # so we try to get meta information although we already have meta for the given id
+    #    elif meta['title'] != self._clean_string(name.lower()):
 
-            if media_type==self.type_movie:
-                meta = self._get_tmdb_meta(imdb_id, tmdb_id, name, year, rating)
-            elif media_type==self.type_tvshow:
-                meta = self._get_tvdb_meta(imdb_id, name, year, rating)
+    #        if media_type==self.type_movie:
+    #            meta = self._get_tmdb_meta(imdb_id, tmdb_id, name, year, rating)
+    #        elif media_type==self.type_tvshow:
+    #            meta = self._get_tvdb_meta(imdb_id, name, year, rating)
 
-            self._cache_save_video_meta(meta, name, media_type, overlay)
+    #        self._cache_save_video_meta(meta, name, media_type, overlay)
 
-        meta = self.__format_meta(media_type, meta, name)
+    #    meta = self.__format_meta(media_type, meta, name)
         
-        return meta
+    #    return meta
 
     def _cache_lookup_by_name(self, media_type, name, year='', rating=''):
         '''
@@ -114,32 +117,32 @@ class MetaData(metahandlers.MetaData):
             common.addon.log('No match in local DB', 0)
             return None
 
-    def _get_tmdb_meta(self, imdb_id, tmdb_id, name, year='', rating=''):
-        '''
-        Requests meta data from TMDB and creates proper dict to send back
+    #def _get_tmdb_meta(self, imdb_id, tmdb_id, name, year='', rating=''):
+    #    '''
+    #    Requests meta data from TMDB and creates proper dict to send back
 
-        Args:
-            imdb_id (str): IMDB ID
-            name (str): full name of movie you are searching
-        Kwargs:
-            year (str): 4 digit year of movie, when imdb_id is not available it is recommended
-            to include the year whenever possible to maximize correct search results.
-            rating (float): IMDB or TMDB rating of the movie/tvshow, can possibly increase the search accuracy
+    #    Args:
+    #        imdb_id (str): IMDB ID
+    #        name (str): full name of movie you are searching
+    #    Kwargs:
+    #        year (str): 4 digit year of movie, when imdb_id is not available it is recommended
+    #        to include the year whenever possible to maximize correct search results.
+    #        rating (float): IMDB or TMDB rating of the movie/tvshow, can possibly increase the search accuracy
 
-        Returns:
-            DICT. It must also return an empty dict when
-            no movie meta info was found from tmdb because we should cache
-            these "None found" entries otherwise we hit tmdb alot.
-        '''
+    #    Returns:
+    #        DICT. It must also return an empty dict when
+    #        no movie meta info was found from tmdb because we should cache
+    #        these "None found" entries otherwise we hit tmdb alot.
+    #    '''
         
-        tmdb = TMDB(lang = 'de')
-        meta = tmdb.tmdb_lookup(name,imdb_id,tmdb_id, year)
+    #    tmdb = TMDB(lang = 'de')
+    #    meta = tmdb.tmdb_lookup(name,imdb_id,tmdb_id, year)
         
-        if meta is None:
-            # create an empty dict so below will at least populate empty data for the db insert.
-            meta = {}
+    #    if meta is None:
+    #        # create an empty dict so below will at least populate empty data for the db insert.
+    #        meta = {}
 
-        return self._format_tmdb_meta(meta, imdb_id, name, year)
+    #    return self._format_tmdb_meta(meta, imdb_id, name, year)
 
     def _get_tvdb_meta(self, imdb_id, name, year='', rating=''):
         '''
@@ -423,6 +426,57 @@ class MetaData(metahandlers.MetaData):
 
         common.addon.log('Returning results: %s' % movie_list, 0)
         return movie_list
+
+    def change_watched(self, media_type, name, imdb_id, tmdb_id='', season='', episode='', year='', watched='', air_date=''):
+        '''
+        Change watched status on video
+
+        Args:
+            imdb_id (str): IMDB ID
+            media_type (str): type of video to update, 'movie', 'tvshow' or 'episode'
+            name (str): name of video
+        Kwargs:
+            season (int): season number
+            episode (int): episode number
+            year (int): Year
+            watched (int): Can specify what to change watched status (overlay) to
+        '''
+        common.addon.log('---------------------------------------------------------------------------------------', 2)
+        common.addon.log('Updating watched flag for: %s %s %s %s %s %s %s %s %s' % (media_type, name, imdb_id, tmdb_id, season, episode, year, watched, air_date), 2)
+
+        if imdb_id:
+            imdb_id = self._valid_imdb_id(imdb_id)
+
+        tvdb_id = ''
+        if media_type in (self.type_tvshow, self.type_season):
+            tvdb_id = self._get_tvdb_id(name, imdb_id)
+        
+        if media_type in (self.type_movie, self.type_tvshow, self.type_season):
+            if not watched:
+                watched = self._get_watched(media_type, imdb_id, tmdb_id, season=season)
+                if watched == 6:
+                    watched = 7
+                else:
+                    watched = 6
+            self._update_watched(imdb_id, media_type, watched, tmdb_id=tmdb_id, name=self._clean_string(name.lower()), year=year, season=season, tvdb_id=tvdb_id)
+        elif media_type == self.type_episode:
+            if tvdb_id is None:
+                tvdb_id = ''
+            tmp_meta = {}
+            tmp_meta['imdb_id'] = imdb_id
+            tmp_meta['tvdb_id'] = tvdb_id
+            tmp_meta['title'] = name
+            tmp_meta['season'] = season
+            tmp_meta['episode'] = episode
+            tmp_meta['premiered'] = ''
+            
+            if not watched:
+                watched = self._get_watched_episode(tmp_meta)
+                if watched == 6:
+                    watched = 7
+                else:
+                    watched = 6
+            self._update_watched(imdb_id, media_type, watched, name=name, season=season, episode=episode, tvdb_id=tvdb_id, air_date=air_date)
 
 
 class TheTVDB(thetvdbapi.TheTVDB):

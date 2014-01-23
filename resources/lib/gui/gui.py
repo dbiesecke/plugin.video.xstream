@@ -1,44 +1,79 @@
 # -*- coding: utf-8 -*-
 from resources.lib.gui.contextElement import cContextElement
 from resources.lib.config import cConfig
-#from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
-from resources.lib.handler.pluginHandler import cPluginHandler
 from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.gui.guiElement import cGuiElement
+from resources.lib import common
 
 import xbmc
 import xbmcgui
 import xbmcplugin
 
 import urllib
+import sys,os
 
 class cGui:
     '''
     This class "abstracts" a list of xbmc listitems.
     '''
-    def addFolder(self, oGuiElement, oOutputParameterHandler='', bIsFolder = True, iTotal = 0 ):
+
+    def __init__(self):
+        try:
+            self.pluginHandle = int( sys.argv[ 1 ] )
+        except :
+            self.pluginHandle = 0
+        try:
+            self.pluginPath = sys.argv[0]
+        except:
+            self.pluginPath = ''
+        if cConfig().getSetting('metahandler')=='true':
+           self.isMetaOn = True
+        else:
+           self.isMetaOn = False
+
+
+    def addFolder(self, oGuiElement, oOutputParameterHandler='', bIsFolder = True, iTotal = 0, isHoster = False):
         '''
         add GuiElement to Gui, adds listitem to a list
         '''
+        if not oGuiElement._isMetaSet and self.isMetaOn and oGuiElement._mediaType:
+            imdbID = oOutputParameterHandler.getValue('imdbID')
+            if imdbID:
+                oGuiElement.getMeta(oGuiElement._mediaType, imdbID)
+            else:
+                oGuiElement.getMeta(oGuiElement._mediaType)
+        
         sItemUrl = self.__createItemUrl(oGuiElement, bIsFolder, oOutputParameterHandler)
-        oListItem = self.createListItem(oGuiElement)
+        oListItem = self.createListItem(oGuiElement)       
+        oListItem = self.__createContextMenu(oGuiElement, oListItem, bIsFolder, sItemUrl, oOutputParameterHandler)
+                 
         #if not bIsFolder:
-        #    oListItem.setProperty('IsPlayable', 'true')
-        oListItem = self.__createContextMenu(oGuiElement, oListItem, bIsFolder, sItemUrl, oOutputParameterHandler)        
-        sPluginHandle = cPluginHandler().getPluginHandle()
-        xbmcplugin.addDirectoryItem(sPluginHandle, sItemUrl, oListItem, isFolder = bIsFolder, totalItems = iTotal)
+        #    oListItem.setProperty('IsPlayable', 'true')        
+        if not bIsFolder and cConfig().getSetting('hosterListFolder') == 'true':
+            bIsFolder = True
+        if isHoster:
+            bIsFolder = False
+        xbmcplugin.addDirectoryItem(self.pluginHandle, sItemUrl, oListItem, isFolder = bIsFolder, totalItems = iTotal)
         
 
-    def addNextPage(self, site, function, oParams=''):
+    def addNextPage(self, site, function, oParams='', totalPages = 0):
+        '''
+        inserts a standard "next page" button into a listing 
+        '''
         guiElement = cGuiElement('Next Page -->',site,function)
         self.addFolder(guiElement, oParams)
         
         
     def createListItem(self, oGuiElement):
+        '''
+        creates a standrad xbmcgui.listitem from the GuiElement
+        '''
         itemValues= oGuiElement.getItemValues()
         itemTitle = oGuiElement.getTitle()
         if oGuiElement._sLanguage != '':
             itemTitle += ' (%s)' % oGuiElement._sLanguage
+        if oGuiElement._sSubLanguage != '':
+            itemTitle += ' *Sub: %s*' % oGuiElement._sSubLanguage
         if oGuiElement._sQuality != '':
             itemTitle += ' [%s]' % oGuiElement._sQuality
         itemValues['title'] = itemTitle
@@ -53,13 +88,12 @@ class cGui:
         
 
     def __createContextMenu(self, oGuiElement, oListItem, bIsFolder, sItemUrl, oOutputParams=''):
-        sPluginPath = cPluginHandler().getPluginPath()
         aContextMenus = []
         if len(oGuiElement.getContextItems()) > 0:
           for oContextItem in oGuiElement.getContextItems():
             oOutputParameterHandler = oContextItem.getOutputParameterHandler()
             sParams = oOutputParameterHandler.getParameterAsUri()                
-            sTest = "%s?site=%s&function=%s&%s" % (sPluginPath, oContextItem.getFile(), oContextItem.getFunction(), sParams)                
+            sTest = "%s?site=%s&function=%s&%s" % (self.pluginPath, oContextItem.getFile(), oContextItem.getFunction(), sParams)                
             aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s)" % (sTest,),)]
 
         oContextItem = cContextElement()
@@ -85,55 +119,58 @@ class cGui:
                 metaParams['mediaType'] = 'episode'
             if itemValues['imdb_id']:
                 metaParams['imdbID'] = itemValues['imdb_id']
-                oContextItem.setTitle("gesehen/ungesehen")
-                aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s?function=changeWatched&%s)" % (sPluginPath, urllib.urlencode(metaParams),),)]
+                if itemValues['overlay'] == '7':
+                    oContextItem.setTitle("Als ungesehen markieren")
+                else:
+                    oContextItem.setTitle("Als gesehen markieren")
+                aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s?function=changeWatched&%s)" % (self.pluginPath, urllib.urlencode(metaParams),),)]
             if 'year' in itemValues and itemValues['year']:
                 metaParams['year'] = itemValues['year']
             oContextItem.setTitle("Suche Metainfos")
-            aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s?function=updateMeta&%s)" % (sPluginPath, urllib.urlencode(metaParams),),)]
+            aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s?function=updateMeta&%s)" % (self.pluginPath, urllib.urlencode(metaParams),),)]
+
         if not bIsFolder:
             oContextItem.setTitle("add to Playlist")     
             aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s&playMode=enqueue)" % (sItemUrl,),)]
             oContextItem.setTitle("download")
             aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s&playMode=download)" % (sItemUrl,),)]
-            oContextItem.setTitle("send to JDownloader")
-            aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s&playMode=jd)" % (sItemUrl,),)]   
+            if cConfig().getSetting('jd_enabled') == 'true':
+                oContextItem.setTitle("send to JDownloader")
+                aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s&playMode=jd)" % (sItemUrl,),)]   
         oListItem.addContextMenuItems(aContextMenus)
         #oListItem.addContextMenuItems(aContextMenus, True)  
         return oListItem
         
 
-    def setEndOfDirectory(self):
+    def setEndOfDirectory(self, success = True):
         '''
         mark the listing as completed, this is mandatory
         '''
-        iHandler = cPluginHandler().getPluginHandle()
-        xbmcplugin.setPluginCategory(iHandler, "")
-        # add some sort methods, these will be present in all views         
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_UNSORTED)
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_VIDEO_RATING)
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_LABEL)       
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_DATE)
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_PROGRAM_COUNT)
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
-        xbmcplugin.addSortMethod(iHandler, xbmcplugin.SORT_METHOD_GENRE) 
+        xbmcplugin.setPluginCategory(self.pluginHandle, "")
+        # add some sort methods, these will be available in all views         
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_UNSORTED)
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_VIDEO_RATING)
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_LABEL)       
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_DATE)
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_PROGRAM_COUNT)
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_VIDEO_RUNTIME)
+        xbmcplugin.addSortMethod(self.pluginHandle, xbmcplugin.SORT_METHOD_GENRE) 
           
-        xbmcplugin.endOfDirectory(iHandler, True)
+        xbmcplugin.endOfDirectory(self.pluginHandle, success)
         
  
     def setView(self, content='movies'):
         '''
         set the listing to a certain content, makes special views available
         '''
-        iHandler = cPluginHandler().getPluginHandle()
         if content == 'movies':
-            xbmcplugin.setContent(iHandler, 'movies')
+            xbmcplugin.setContent(self.pluginHandle, 'movies')
         elif content == 'tvshows':
-            xbmcplugin.setContent(iHandler, 'tvshows')
+            xbmcplugin.setContent(self.pluginHandle, 'tvshows')
         elif content == 'seasons':
-            xbmcplugin.setContent(iHandler, 'seasons')
+            xbmcplugin.setContent(self.pluginHandle, 'seasons')
         elif content == 'episodes':
-            xbmcplugin.setContent(iHandler, 'episodes')
+            xbmcplugin.setContent(self.pluginHandle, 'episodes')
         if cConfig().getSetting('auto-view')=='true':
             xbmc.executebuiltin("Container.SetViewMode(%s)" % cConfig().getSetting(content+'-view') )
 
@@ -147,37 +184,40 @@ class cGui:
 
     def __createItemUrl(self, oGuiElement, bIsFolder, oOutputParameterHandler=''):
         if (oOutputParameterHandler == ''):
-            #cOutputParameterHandler
             oOutputParameterHandler = ParameterHandler()
+       
+        itemValues = oGuiElement.getItemValues()
+        if 'imdb_id' in itemValues and itemValues['imdb_id']:
+            oOutputParameterHandler.setParam('imdbID',itemValues['imdb_id'])
+        if 'TVShowTitle' in itemValues and itemValues['TVShowTitle']:
+            oOutputParameterHandler.setParam('TVShowTitle',itemValues['TVShowTitle'])
+        if 'season' in itemValues and itemValues['season'] and int(itemValues['season'])>0:
+            oOutputParameterHandler.setParam('season',itemValues['season'])
+        if 'episode' in itemValues and itemValues['episode'] and int(itemValues['episode'])>0:
+            oOutputParameterHandler.setParam('episode',itemValues['episode'])
+        #TODO change this, it can cause bugs
         if not bIsFolder:
+            oOutputParameterHandler.setParam('playMode','play')
+            
             thumbnail = oGuiElement.getThumbnail()
             if thumbnail:
-                oOutputParameterHandler.setParam('thumb',thumbnail) 
-            itemValues = oGuiElement.getItemValues()
-            metaParams = {} 
-            if 'imdb_id' in itemValues and itemValues['imdb_id']:
-                oOutputParameterHandler.setParam('imdbID',itemValues['imdb_id'])
-            #if itemValues['title']:
-            #    metaParams['title'] = itemValues['title']
-            if 'mediaType' in itemValues and itemValues['mediaType']:
-                oOutputParameterHandler.setParam('mediaType',itemValues['mediaType'])
+                oOutputParameterHandler.setParam('thumb',thumbnail)
+
+            if oGuiElement._mediaType:
+                oOutputParameterHandler.setParam('mediaType', oGuiElement._mediaType)
             elif 'TVShowTitle' in itemValues and itemValues['TVShowTitle']:
                 oOutputParameterHandler.setParam('mediaType','tvshow')
             if 'season' in itemValues and itemValues['season'] and int(itemValues['season'])>0:
-                oOutputParameterHandler.setParam('season',itemValues['season'])
                 oOutputParameterHandler.setParam('mediaType','season')
             if 'episode' in itemValues and itemValues['episode'] and int(itemValues['episode'])>0:
-                oOutputParameterHandler.setParam('episode',itemValues['episode'])
                 oOutputParameterHandler.setParam('mediaType','episode')
-            oOutputParameterHandler.setParam('playMode','play')               
+                                             
         sParams = oOutputParameterHandler.getParameterAsUri()
-        sPluginPath = cPluginHandler().getPluginPath()
         if len(oGuiElement.getFunction()) == 0:
-            sItemUrl = "%s?site=%s&title=%s&%s" % (sPluginPath, oGuiElement.getSiteName(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
+            sItemUrl = "%s?site=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
         else:
-            sItemUrl = "%s?site=%s&function=%s&title=%s&%s" % (sPluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
-        return sItemUrl
-        
+            sItemUrl = "%s?site=%s&function=%s&title=%s&%s" % (self.pluginPath, oGuiElement.getSiteName(), oGuiElement.getFunction(), urllib.quote_plus(oGuiElement.getTitle()), sParams)
+        return sItemUrl       
 
     def showKeyBoard(self, sDefaultText = ""):
         # Create the keyboard object and display it modal

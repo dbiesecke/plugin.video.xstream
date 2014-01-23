@@ -36,8 +36,8 @@ def __createMenuEntry(oGui, sFunction, sLabel, oOutputParameterHandler = ''):
 
 def showCurrentMovies():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
 
     oRequestHandler = cRequestHandler(sUrl)
     sHtmlContent = oRequestHandler.request();
@@ -71,8 +71,8 @@ def showCurrentMovies():
 
 def showAnimesAlphabetic():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
 
     oRequestHandler = cRequestHandler(sUrl)
     sHtmlContent = oRequestHandler.request();
@@ -102,8 +102,8 @@ def showAnimesAlphabetic():
 
 def showMovieTitles():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
         
     sUrl = sUrl.replace(' ', '%20').replace(':', '%3A').replace('+', '%2B')
     sUrl = sUrl.replace('http%3A//', 'http://')
@@ -151,9 +151,9 @@ def __checkForNextPage(sHtmlContent):
 
 def showHosters():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
-    sMovieTitle = oInputParameterHandler.getValue('sMovieTitle')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
+    sMovieTitle = params.getValue('sMovieTitle')
 
     oRequestHandler = cRequestHandler(sUrl)
     sHtmlContent = oRequestHandler.request();
@@ -194,10 +194,10 @@ def showHosters():
 def showHosterMenu():
     oGui = cGui()
 
-    oInputParameterHandler = cInputParameterHandler()
-    sTitle = oInputParameterHandler.getValue('Title')	
-    sUrl = oInputParameterHandler.getValue('siteUrl')
-    sHoster = oInputParameterHandler.getValue('hosterName')
+    params = cInputParameterHandler()
+    sTitle = params.getValue('Title')	
+    sUrl = params.getValue('siteUrl')
+    sHoster = params.getValue('hosterName')
     
     cHosterGui().showHosterMenuDirect(oGui, sHoster, sUrl, sFileName=sTitle)
     oGui.setEndOfDirectory()

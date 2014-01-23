@@ -1,27 +1,26 @@
-<settings>
-    <category label="30021">
-
-        <setting default="false" id="debug" label="30000" type="bool" />
-        <setting default="2" id="playerType" label="30001" type="enum" values="Auto|MPlayer|DVDPlayer" />
+<settings> 
+    <category label="30021">       
+        <!--<setting default="false" id="debug" label="30000" type="bool" />
+        <setting default="2" id="playerType" label="30001" type="enum" values="Auto|MPlayer|DVDPlayer" />-->
         <setting default="false" id="autoPlay" label="30005" type="bool" />
+        <setting default="false" id="hosterListFolder" label="30007" type="bool" enable="eq(-1,false)"/>
         <setting default="2" id="prefLanguage" label="30002" type="enum" values="ger|eng|all" />
         <setting default="false" id="metahandler" label="30004" type="bool" />
         <setting default="600" id="cacheTime" label="30006" type="number" />
         <setting default="false" id="showAdult" label="30003" type="bool" />
         <setting type="sep" />
-    </category>
-    <category label="30022">
-
+    </category> 
+    <category label="30022">       
         <setting default="false" id="plugin_anime_proxer_me" label="Anime.Proxer.Me" type="bool" />
         <setting default="false" id="plugin_anime_stream24_com" label="Anime-Stream24.com" type="bool" />
         <setting default="false" id="plugin_bundesliga_de" label="Bundesliga.de" type="bool" />
         <setting default="false" id="plugin_burning_series_org" label="Burning-Seri.es" type="bool" />
         <setting default="false" id="plugin_gstream_in" label="G-Stream.in" type="bool" />
         <setting default="false" id="plugin_kinox_to" label="Kinox.to" type="bool" />
+        <setting default="false" id="plugin_kkiste_to" label="KKiste.to" type="bool" />
+        <setting default="false" id="plugin_megatv_to" label="MegaTV.to" type="bool" />
         <setting default="false" id="plugin_movie4k_to" label="Movie4k.to" type="bool" />
         <setting default="false" id="plugin_stream_oase_tv" label="Stream-Oase.tv" type="bool" />
-        <setting default="false" id="plugin_megatv_to" label="MegaTV.to" type="bool" />
-        <setting default="false" id="plugin_kkiste_to" label="KKiste.to" type="bool" />
         <setting type="sep" />
     </category>
     <category label="Views">
@@ -31,13 +30,14 @@
         <setting default="504" enable="!eq(-3,false)" id="seasons-view" label="Staffel-View" type="number" />
         <setting default="504" enable="!eq(-4,false)" id="episodes-view" label="Episoden-View" type="number" />
     </category>
-    <category label="30023">
-
+    <category label="30024">
+        <setting label="30080" type="sep" />
+        <setting id="download-folder" type="folder" label="30081" default=""/>
+        <setting label="30070" type="sep" />
         <setting default="false" id="jd_enabled" label="30071" type="bool" />
-        <setting default="127.0.0.1" id="jd_host" label="30072" type="text" />
-        <setting default="10025" id="jd_port" label="30073" type="text" />
-        <setting default="true" id="jd_automatic_start" label="30074" type="bool" />
-        <setting default="false" id="jd_grabber" label="30075" type="bool" />
-        <setting type="sep" />
-    </category>
+        <setting default="127.0.0.1" enable="!eq(-1,false)" id="jd_host" label="30072" type="text" />
+        <setting default="10025" enable="!eq(-2,false)" id="jd_port" label="30073" type="text" />
+        <setting default="true" enable="!eq(-3,false)" id="jd_automatic_start" label="30074" type="bool" />
+        <setting default="false" enable="!eq(-4,false)" id="jd_grabber" label="30075" type="bool" />
+    </category> 
 </settings>

@@ -1,47 +1,31 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
         <!-- general begin by 30000 - 30050 -->
-        <string id="30000">Logging</string>
+        <string id="30000">Debug-Mode</string>
         <string id="30001">Videoplayer</string>
         <string id="30002">preferred language</string>
         <string id="30003">show XXX sections (you have to be at legal age)</string>
         <string id="30004">use metahandler</string>
         <string id="30005">choose hoster automatically</string>
         <string id="30006">cachetime for websites (seconds)</string>
+        <string id="30007">show hosterlist as folder</string>
 
         <!-- settingtabs begin by 30021 - 30030 -->
-        <string id="30021">Allgemein</string>
-        <string id="30022">plugins on/off</string>
+        <string id="30021">General</string>
+        <string id="30022">Site-plugins</string>
         <string id="30023">JDownloader settings</string>
-        <string id="30024">Hoster</string>
+        <string id="30024">Downloads</string>
 
-        <!-- JDownloader begin by 30071 - 30075 -->
-        <string id="30071">on/off</string>
+        <!-- Downloads begin by 30071 - 30085 -->
+        <string id="30070">JDownloader</string>
+        <string id="30071">JDownloader on/off</string>
         <string id="30072">Host</string>
         <string id="30073">Port</string>
-        <string id="30074">start download automatically</string>
-        <string id="30075">send to LinkGrabber</string>
-
-
-        <!-- Pluginnames begin by 30201 - 30299 -->
-        <!--<string id="30201">Kino.to</string>
-        <string id="30202">Souhtpark.de</string>
-        <string id="30203">Myp2p.eu</string>
-        <string id="30204">G-Stream.in</string>
-        <string id="30205">NBA.de</string>
-        <string id="30206">Bundesliga.de</string>
-        <string id="30207">MTV.de</string>
-        <string id="30208">Kino.de</string>
-        <string id="30209">Bild.de</string>
-        <string id="30210">MovieMaze.de</string>
-        <string id="30211">Shoutcast.com</string>
-        <string id="30212">Movie2k.com</string>
-        <string id="30213">Simpsons.to</string>
-        <string id="30214">Iload.to</string>
-        <string id="30215">Br-Online.de</string>
-        <string id="30216">Anime-stream24.com</string>
-        <string id="30217">RadioTime.com</string> -->
-
+        <string id="30074">Start download automatically</string>
+        <string id="30075">Send to LinkGrabber only</string>
+        <string id="30080">XBMC-Download</string>
+        <string id="30081">Download-folder</string>
+  
         <string id="30302">Seasons german</string>
         <string id="30303">Seasons english</string>
         <string id="30304">Search</string>

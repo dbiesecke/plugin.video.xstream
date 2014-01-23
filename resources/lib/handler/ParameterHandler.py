@@ -1,6 +1,6 @@
 import urllib
 import sys
-# neuer ParameterHandler, bequemer
+
 class ParameterHandler:
 	
     def __init__(self):          
@@ -29,7 +29,6 @@ class ParameterHandler:
 
     def exist(self, paramName):
         '''
-        ParameterHandler.exist(paramName)
         checks if paramter with the name "paramName" exists
         '''
         return paramName in self.__params
@@ -37,7 +36,7 @@ class ParameterHandler:
     def setParam(self, paramName, paramValue):
         '''
         set the value of the parameter with the name "paramName" to "paramValue"
-        if there is no such parameter the parameter is created
+        if there is no such parameter, the parameter is created
         if no value is given "paramValue" is set "None"
         '''
         paramValue = str(paramValue)

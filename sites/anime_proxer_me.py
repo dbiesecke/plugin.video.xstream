@@ -61,9 +61,9 @@ def __createMenuEntry(oGui, sFunction, sLabel, oOutputParameterHandler = ''):
     oGui.addFolder(oGuiElement, oOutputParameterHandler)
 
 def showCharacters():
-    oInputParameterHandler = cInputParameterHandler()    
-    sSiteUrl = oInputParameterHandler.getValue('siteUrl')
-    sNextFunction = oInputParameterHandler.getValue('nextFunction')
+    params = cInputParameterHandler()    
+    sSiteUrl = params.getValue('siteUrl')
+    sNextFunction = params.getValue('nextFunction')
 
     oGui = cGui()
     __createCharacters(oGui, '0-9', sSiteUrl, sNextFunction)
@@ -112,9 +112,9 @@ def __createCharacters(oGui, sCharacter, sSiteUrl, sNextFunction):
     oGui.addFolder(oGuiElement, oOutputParameterHandler)
 
 def parseList():
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
-    sNextFunction = oInputParameterHandler.getValue('nextFunction')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
+    sNextFunction = params.getValue('nextFunction')
     __parseList(sUrl, sNextFunction)
 
 def __parseList(sUrl, sNextFunction):
@@ -152,8 +152,8 @@ def __parseList(sUrl, sNextFunction):
 
 def getAvaiableTypes():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
     sUrl = sUrl.replace('&amp;', '&')
 
 
@@ -186,45 +186,45 @@ def __getAvaiableTypes(oGui, sUrl, sHtmlContent, sPattern, sTitle, sNextFunction
         oGui.addFolder(oGuiElement, oOutputParameterHandler)
 
 def showSeries():    
-    oInputParameterHandler = cInputParameterHandler()
+    params = cInputParameterHandler()
 
     iPage = 1
-    if (oInputParameterHandler.exist('page')):
-        iPage = oInputParameterHandler.getValue('page')
+    if (params.exist('page')):
+        iPage = params.getValue('page')
 
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    sUrl = params.getValue('siteUrl')
     print sUrl
     #sUrl = sUrl + '&set=serie'    
     __parseMediaSite(sUrl, iPage)
 
 def showMovies():
-    oInputParameterHandler = cInputParameterHandler()
+    params = cInputParameterHandler()
 
     iPage = 1
-    if (oInputParameterHandler.exist('page')):
-        iPage = oInputParameterHandler.getValue('page')
+    if (params.exist('page')):
+        iPage = params.getValue('page')
 
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    sUrl = params.getValue('siteUrl')
     sUrl = sUrl + '&set=movie'    
     __parseMediaSite(sUrl, iPage)
 
 def showOvas():
-    oInputParameterHandler = cInputParameterHandler()
+    params = cInputParameterHandler()
 
     iPage = 1
-    if (oInputParameterHandler.exist('page')):
-        iPage = oInputParameterHandler.getValue('page')
+    if (params.exist('page')):
+        iPage = params.getValue('page')
 
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    sUrl = params.getValue('siteUrl')
     sUrl = sUrl + '&set=ova'    
     __parseMediaSite(sUrl, iPage)
 
 def showNextPage():
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
     iPage = 1
-    if (oInputParameterHandler.exist('page')):
-	iPage = oInputParameterHandler.getValue('page')
+    if (params.exist('page')):
+	iPage = params.getValue('page')
 
     __parseMediaSite(sUrl, iPage)
 
@@ -292,9 +292,9 @@ def __checkFoxNextSite(iCurrentPage, sHtmlContent):
 
 def showHoster():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
-    sNumber = oInputParameterHandler.getValue('number')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
+    sNumber = params.getValue('number')
     oRequestHandler = cRequestHandler(sUrl)
     sHtmlContent = oRequestHandler.request();
 
@@ -332,9 +332,9 @@ def showHoster():
 
 def getMovieUrl():
     oGui = cGui()
-    oInputParameterHandler = cInputParameterHandler()
-    sUrl = oInputParameterHandler.getValue('siteUrl')
-    sHosterIdentifier = oInputParameterHandler.getValue('hosterIdentifier')
+    params = cInputParameterHandler()
+    sUrl = params.getValue('siteUrl')
+    sHosterIdentifier = params.getValue('hosterIdentifier')
     oHoster = cHosterHandler().getHoster2(sHosterIdentifier)            
     
     oRequestHandler = cRequestHandler(sUrl)

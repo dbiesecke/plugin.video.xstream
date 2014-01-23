@@ -1,23 +1,20 @@
 ﻿# -*- coding: utf-8 -*-
 from resources.lib.handler.jdownloaderHandler import cJDownloaderHandler
 from resources.lib.download import cDownload
-from resources.lib.handler.hosterHandler import cHosterHandler
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
-from resources.lib.handler.inputParameterHandler import cInputParameterHandler
-from resources.lib.handler.outputParameterHandler import cOutputParameterHandler
 from resources.lib.player import cPlayer
 from resources.lib.handler.requestHandler import cRequestHandler
 import urlresolver
 import logger
 
-from ParameterHandler import *
+from resources.lib.handler.ParameterHandler import ParameterHandler
 import xbmc, xbmcgui
 from resources.lib.config import cConfig
 
 #test
 import xbmcplugin
-from resources.lib.handler.pluginHandler import cPluginHandler
+import sys
 
 class cHosterGui:
 
@@ -32,130 +29,44 @@ class cHosterGui:
             # self.autoPlay = False
         self.dialog = False
 
-    # step 1 - bGetRedirectUrl in ein extra optionsObject verpacken
-    def showHoster(self, oGui, oHoster, sMediaUrl, bGetRedirectUrl = False):
-        print "cHosterGui.showHoster is deprecated"
-        oGuiElement = cGuiElement()
-        oGuiElement.setSiteName(self.SITE_NAME)
-        oGuiElement.setFunction('showHosterMenu')
-        oGuiElement.setTitle(oHoster.getDisplayName())
-
-        oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sMediaUrl', sMediaUrl)
-        oOutputParameterHandler.addParameter('sHosterIdentifier', oHoster.getPluginIdentifier())
-        oOutputParameterHandler.addParameter('bGetRedirectUrl', bGetRedirectUrl)
-        oOutputParameterHandler.addParameter('sFileName', oHoster.getFileName())
-
-        oGui.addFolder(oGuiElement, oOutputParameterHandler)
-
-    # step 2
-    def showHosterMenu(self):
-        print "cHosterGui.showHosterMenu is deprecated"
-        oGui = cGui()
-        oInputParameterHandler = cInputParameterHandler()
-
-        sHosterIdentifier = oInputParameterHandler.getValue('sHosterIdentifier')
-        sMediaUrl = oInputParameterHandler.getValue('sMediaUrl')
-        bGetRedirectUrl = oInputParameterHandler.getValue('bGetRedirectUrl')
-        #sFileName = oInputParameterHandler.getValue('sFileName')
-
-        oHoster = cHosterHandler().getHoster(sHosterIdentifier)
-        oHoster.setFileName(sFileName)
-        
-        self.showHosterMenuDirect(oGui, oHoster, sMediaUrl, bGetRedirectUrl)
-        
-        oGui.setEndOfDirectory()
-
-    def showHosterMenuDirect(self, oGui, oHoster, sMediaUrl, bGetRedirectUrl=False, sFileName=''):
-        print "cHosterGui.showHosterMenuDirect is deprecated"
-        # play
-        self.__showPlayMenu(oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName)
-        # playlist
-        self.__showPlaylistMenu(oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName)
-        # download
-        self.__showDownloadMenu(oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName)        
-        # JD
-        self.__showJDMenu(oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName)
-
-        
-    def __showPlayMenu(self, oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName=''):
-        print "cHosterGui.showPlayMenu is deprecated"
-        oGuiElement = cGuiElement('play',self.SITE_NAME,'play')
-        oOutputParameterHandler = ParameterHandler()
-        oOutputParameterHandler.setParam('sMediaUrl', sMediaUrl)
-        oOutputParameterHandler.setParam('bGetRedirectUrl', bGetRedirectUrl)
-        oOutputParameterHandler.setParam('sFileName', sFileName)
-        oGui.addFolder(oGuiElement, oOutputParameterHandler)
-
-    def __showDownloadMenu(self, oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName=''):
-        print "cHosterGui.showDownloadMenu is deprecated"
-        oGuiElement = cGuiElement()
-        oGuiElement.setSiteName(self.SITE_NAME)
-        oGuiElement.setFunction('download')
-        oGuiElement.setTitle('download über XBMC')
-        oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sMediaUrl', sMediaUrl)
-        oOutputParameterHandler.addParameter('bGetRedirectUrl', bGetRedirectUrl)
-        oOutputParameterHandler.addParameter('sFileName', sFileName)
-        oGui.addFolder(oGuiElement, oOutputParameterHandler)
-
-    def __showJDMenu(self, oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName=''):
-        print "cHosterGui.showJDMenu is deprecated"
-        oGuiElement = cGuiElement()
-        oGuiElement.setSiteName(self.SITE_NAME)        
-        oGuiElement.setTitle('an JDownloader senden')
-        oGuiElement.setFunction('sendToJDownloader')
-        oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sMediaUrl', sMediaUrl)
-        oOutputParameterHandler.addParameter('bGetRedirectUrl', bGetRedirectUrl)
-        oGui.addFolder(oGuiElement, oOutputParameterHandler)
-
-    def __showPlaylistMenu(self, oGui, sMediaUrl, oHoster, bGetRedirectUrl, sFileName=''):
-        print "cHosterGui.showPlaylistMenu is deprecated"
-        oGuiElement = cGuiElement()
-        oGuiElement.setSiteName(self.SITE_NAME)
-        oGuiElement.setFunction('addToPlaylist')
-        oGuiElement.setTitle('add to playlist')
-        oOutputParameterHandler = cOutputParameterHandler()
-        oOutputParameterHandler.addParameter('sMediaUrl', sMediaUrl)
-        oOutputParameterHandler.addParameter('bGetRedirectUrl', bGetRedirectUrl)
-        oOutputParameterHandler.addParameter('sFileName', sFileName)
-        oGui.addFolder(oGuiElement, oOutputParameterHandler)
 
     def play(self, siteResult=False):
         oGui = cGui()
-        oInputParameterHandler = ParameterHandler()
-        sMediaUrl = oInputParameterHandler.getValue('sMediaUrl')
-        sFileName = oInputParameterHandler.getValue('sFileName')
+        params = ParameterHandler()
+        sMediaUrl = params.getValue('sMediaUrl')
+        sFileName = params.getValue('sFileName')
         if not sFileName:
-            sFileName = oInputParameterHandler.getValue('Title')
+            sFileName = params.getValue('Title')
         if not sFileName:
-            sFileName = oInputParameterHandler.getValue('title')
+            sFileName = params.getValue('title')
         if not sFileName: #nur vorrübergehend
-            sFileName = oInputParameterHandler.getValue('sMovieTitle')
-        sSeason = oInputParameterHandler.getValue('season')
-        sEpisode = oInputParameterHandler.getValue('episode')
-        sShowTitle = oInputParameterHandler.getValue('TvShowTitle')
-        sThumbnail = oInputParameterHandler.getValue('thumb')       
+            sFileName = params.getValue('sMovieTitle')
+        sSeason = params.getValue('season')
+        sEpisode = params.getValue('episode')
+        sShowTitle = params.getValue('TvShowTitle')
+        sThumbnail = params.getValue('thumb')
+              
         if siteResult:
             sMediaUrl = siteResult['streamUrl']
             logger.info('call play: ' + sMediaUrl)
             if siteResult['resolved']:
                 sLink = sMediaUrl
             else:
-                try:
-                    sLink = urlresolver.resolve(sMediaUrl)
-                except:
-                    sLink = False
-                    #raise
+                sLink = urlresolver.resolve(sMediaUrl)
+
         elif sMediaUrl:
             logger.info('call play: ' + sMediaUrl)
             sLink = urlresolver.resolve(sMediaUrl)
         else:
             oGui.showError('xStream', 'Hosterlink not found', 5)
             return False
-        if sLink != False:            
-            logger.info('file link: ' + sLink)
+        if sLink != False:
+            try:
+                logger.info(sLink.msg)
+                sLink = 'http://www.example.de'
+            except:
+                pass
+            logger.info('file link: ' + str(sLink))
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(self.SITE_NAME)
             oGuiElement.setMediaUrl(sLink)
@@ -166,42 +77,44 @@ class cHosterGui:
                 oGuiElement.addItemProperties('Episode',sEpisode)
                 oGuiElement.addItemProperties('Season',sSeason)
                 oGuiElement.addItemProperties('TvShowTitle',sShowTitle)
+
             #listItem = xbmcgui.ListItem(path=sLink)
+            #listItem.setInfo(type="Video", infoLabels='')
             #listItem.setProperty('IsPlayable', 'true')
-            #pluginHandle = cPluginHandler().getPluginHandle()
-            #return xbmcplugin.setResolvedUrl(pluginHandle, True, listItem)
+            #pluginHandle = oGui.pluginHandle
+            #xbmcplugin.setResolvedUrl(pluginHandle, True, listItem)
+
             oPlayer = cPlayer()
             oPlayer.clearPlayList()
             oPlayer.addItemToPlaylist(oGuiElement)
-            if self.dialog:
-                try:
-                    self.dialog.close()
-                except:
-                    pass
+            #if self.dialog:
+            #    try:
+            #        self.dialog.close()
+            #    except:
+            #        pass
             oPlayer.startPlayer()
         else:
             logger.info('file link: ' + str(sLink))
-            oGui.showError('xStream', 'File deleted or Link could not be resolved', 5)
+            #oGui.showError('xStream', 'File deleted or Link could not be resolved', 5)
             return False
-        return True 
 
         
     def addToPlaylist(self, siteResult = False):
         oGui = cGui()
-        oInputParameterHandler = cInputParameterHandler()
+        params = ParameterHandler()
 
-        sMediaUrl = oInputParameterHandler.getValue('sMediaUrl')
-        sFileName = oInputParameterHandler.getValue('sFileName')
+        sMediaUrl = params.getValue('sMediaUrl')
+        sFileName = params.getValue('sFileName')
         if not sFileName:
-            sFileName = oInputParameterHandler.getValue('Title')
+            sFileName = params.getValue('Title')
         if not sFileName:
-            sFileName = oInputParameterHandler.getValue('title')
+            sFileName = params.getValue('title')
         if not sFileName: #nur vorrübergehend
-            sFileName = oInputParameterHandler.getValue('sMovieTitle')
-        sSeason = oInputParameterHandler.getValue('season')
-        sEpisode = oInputParameterHandler.getValue('episode')
-        sShowTitle = oInputParameterHandler.getValue('TvShowTitle')
-        sThumbnail = oInputParameterHandler.getValue('thumb')
+            sFileName = params.getValue('sMovieTitle')
+        sSeason = params.getValue('season')
+        sEpisode = params.getValue('episode')
+        sShowTitle = params.getValue('TvShowTitle')
+        sThumbnail = params.getValue('thumb')
         if siteResult:
             sMediaUrl = siteResult['streamUrl']
             if siteResult['resolved']:
@@ -229,18 +142,18 @@ class cHosterGui:
             oPlayer.addItemToPlaylist(oGuiElement)
             oGui.showInfo('Playlist', 'Stream wurde hinzugefügt', 5);
         else:
-            oGui.showError('Playlist', 'File deleted or Link could not be resolved', 5);
+            #oGui.showError('Playlist', 'File deleted or Link could not be resolved', 5);
             return False
         return True
         
         
     def download(self, siteResult = False):
         #oGui = cGui()
-        oInputParameterHandler = cInputParameterHandler()
+        params = ParameterHandler()
 
-        sMediaUrl = oInputParameterHandler.getValue('sMediaUrl')
-        sFileName = oInputParameterHandler.getValue('sFileName')
-        sFileName = oInputParameterHandler.getValue('sMovieTitle')
+        sMediaUrl = params.getValue('sMediaUrl')
+        sFileName = params.getValue('sFileName')
+        sFileName = params.getValue('sMovieTitle')
         if siteResult:
             sMediaUrl = siteResult['streamUrl']
             if siteResult['resolved']:
@@ -257,24 +170,23 @@ class cHosterGui:
             oDownload = cDownload()
             oDownload.download(sLink, 'Stream')
         else:
-            cGui().showError('Download', 'File deleted or Link could not be resolved', 5);
+            #cGui().showError('Download', 'File deleted or Link could not be resolved', 5);
             return False
         return True
         
         
     def sendToJDownloader(self, sMediaUrl = False):
-        #oGui = cGui()
-        oInputParameterHandler = cInputParameterHandler()
+        params = ParameterHandler()
 
-        sHosterIdentifier = oInputParameterHandler.getValue('sHosterIdentifier')
+        sHosterIdentifier = params.getValue('sHosterIdentifier')
         if not sMediaUrl:            
-            sMediaUrl = oInputParameterHandler.getValue('sMediaUrl')            
-        sFileName = oInputParameterHandler.getValue('sFileName')
+            sMediaUrl = params.getValue('sMediaUrl')            
+        sFileName = params.getValue('sFileName')
         if self.dialog:
             self.dialog.close()
-        logger.info('call send to JDownloader: ' + sMediaUrl)
-        
+        logger.info('call send to JDownloader: ' + sMediaUrl)       
         cJDownloaderHandler().sendToJDownloader(sMediaUrl)
+
         
     def __getRedirectUrl(self, sUrl):
         oRequest = cRequestHandler(sUrl)
@@ -303,6 +215,7 @@ class cHosterGui:
         for i,hoster in ranking:
             hosterQueue.append(hoster)
         return hosterQueue
+
         
     def stream(self, playMode, siteName, function):
         self.dialog = xbmcgui.DialogProgress()
@@ -342,21 +255,26 @@ class cHosterGui:
             self.dialog.update(100)
             self.dialog.close()
             if len(siteResult)>1:
-                #choose hoster                
+                #choose hoster
+                if cConfig().getSetting('hosterListFolder')=='true':
+                    self.showHosterFolder(siteResult, siteName, functionName)
+                    return
                 siteResult = self._chooseHoster(siteResult)
                 if not siteResult:
                     return
-            else:
+            else:                
                 siteResult = siteResult[0]
             # get stream links
             logger.info(siteResult['link'])
             function = getattr(plugin, functionName)
-            siteResult = function(siteResult['link'])
-        # if result is not a list, make in one
-        if not type(siteResult) is list:
-            temp = []
-            temp.append(siteResult)
-            siteResult = temp
+            siteResult = function(siteResult['link'])       
+            # if result is not a list, make in one
+            if not type(siteResult) is list:
+                temp = []
+                temp.append(siteResult)
+                siteResult = temp
+        else:
+            self.dialog.close()
         # choose part
         if len(siteResult)>1:
             siteResult = self._choosePart(siteResult)
@@ -373,6 +291,7 @@ class cHosterGui:
         elif playMode == 'jd':
             self.sendToJDownloader(siteResult['streamUrl'])
 
+
     def checkForResolver(self,sHosterFileName):
         if sHosterFileName != '':
             sHosterFileName = sHosterFileName.lower()
@@ -384,6 +303,7 @@ class cHosterGui:
             if (urlresolver.filter_source_list(source)):
                 return source[0].get_host()
         return False
+
     
     def _chooseHoster(self, siteResult):
         dialog = xbmcgui.Dialog()
@@ -400,6 +320,21 @@ class cHosterGui:
         else:
             return False
 
+            
+    def showHosterFolder(self, siteResult, siteName, functionName):
+        oGui = cGui()
+        total = len(siteResult)
+        params = ParameterHandler()
+        for hoster in siteResult:
+            if 'displayedName' in hoster:
+                name = hoster['displayedName']
+            else:
+                name = hoster['name']
+            oGuiElement = cGuiElement(name, siteName, functionName)
+            params.setParam('url',hoster['link'])
+            oGui.addFolder(oGuiElement, params, iTotal = total, isHoster = True)
+        oGui.setEndOfDirectory()
+
     def _choosePart(self, siteResult):
         self.dialog = xbmcgui.Dialog()
         titles = []
@@ -412,6 +347,7 @@ class cHosterGui:
         else:
             return False
 
+        
     def streamAuto(self, playMode, siteName, function):
         self.dialog = xbmcgui.DialogProgress()
         self.dialog.create('xStream',"get stream/hoster")
@@ -470,6 +406,7 @@ class cHosterGui:
                 except:
                     pass
 
+
     def __autoEnqueue(self, partList, playMode):
         # choose part
         if not partList:
@@ -487,6 +424,7 @@ class cHosterGui:
                 return False
                 raise
         return True
+
 
 class Hoster:
 

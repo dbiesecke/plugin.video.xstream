@@ -4,7 +4,6 @@ from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from resources.lib.gui.hoster import cHosterGui
 from resources.lib.config import cConfig
 import logger
 from ParameterHandler import *
@@ -18,16 +17,6 @@ URL_SHOW_MOVIE = 'http://g-stream.in/showthread.php?t='
 URL_CATEGORIES = 'http://g-stream.in/forumdisplay.php?f='
 URL_SEARCH = 'http://g-stream.in/search.php'
 
-if cConfig().getSetting('metahandler')=='true':
-    META = True
-    try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
-    except:
-        META = False
-        logger.info("Could not import package 'metahandler'")
-else:
-    META = False
 
 def load():
     oGui = cGui()
@@ -228,7 +217,8 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
     if (aResult[0] == False):
-        return  
+        return
+    total = len(aResult[1])  
     for aEntry in aResult[1]:
         sMovieTitle = aEntry[4].replace('&amp;','&')
         sTitle = sMovieTitle
@@ -242,10 +232,12 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
             sTitle = sTitle + ' [HD]'
         
         oGuiElement = cGuiElement(sTitle,SITE_IDENTIFIER,'getHosters')
+        oGuiElement.setMediaType('movie')
+        oGuiElement.setYear(year)
         oGuiElement.setThumbnail(aEntry[0])      
         params.setParam('movieUrl', sUrl)
         params.setParam('sMovieTitle', sMovieTitle)       
-        oGui.addFolder(oGuiElement, params, bIsFolder = False)
+        oGui.addFolder(oGuiElement, params, bIsFolder = False, iTotal = total)
 
     # check for next site
     iTotalPages = __getTotalPages(iPage, sHtmlContent)
@@ -254,7 +246,7 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
         params.setParam('iPage', int(iPage)+1)
         params.setParam('normalySiteUrl', normalySiteUrl)
         params.setParam('siteUrl', normalySiteUrl+str(int(iPage)+1))
-        oGui.addNextPage(SITE_IDENTIFIER,'parseMovieResultSite', params)
+        oGui.addNextPage(SITE_IDENTIFIER,'parseMovieResultSite', params, iTotalPages)
 
     if  iTotalPages > 1:
         oGuiElement = cGuiElement('Go to page x of '+str(iTotalPages),SITE_IDENTIFIER,'gotoPage')
@@ -338,11 +330,13 @@ def getHosters():
     hosters.append('getHosterUrl')
     return hosters
 
-def getHosterUrl(sUrl):
+def getHosterUrl(sUrl = False):
+    params = ParameterHandler() 
+    if not sUrl:
+        sUrl =  params.getValue('url')
     results = []
     if 'g-stream.in/secure/' in sUrl :
-        sHoster = sUrl.split('secure/')[-1].split('/')[0]
-        params = ParameterHandler()        
+        sHoster = sUrl.split('secure/')[-1].split('/')[0]       
         oRequest = cRequestHandler(sUrl, False)
         oRequest.addHeaderEntry('Cookie', params.getValue('securityCookie'))
         oRequest.addHeaderEntry('Referer', params.getValue('movieUrl'))
