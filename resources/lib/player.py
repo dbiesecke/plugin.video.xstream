@@ -12,8 +12,10 @@ class XstreamPlayer(xbmc.Player):
         self.streamFinished = False
         self.playedTime = 0
         self.totalTime = 999999
+        logger.info('player instance created')
     
     def onPlayBackStarted(self):
+        logger.info('starting playeback')
         self.totalTime = self.getTotalTime()
     def onPlayBackStopped(self):
         logger.info('Playback stopped')
@@ -90,6 +92,7 @@ class cPlayer:
     def startPlayer(self):
         logger.info('start player')
         xbmcPlayer = XstreamPlayer()
+        logger.info('add playlist to player instance')
         oPlayList = self.__getPlayList()
         xbmcPlayer.play(oPlayList)
 

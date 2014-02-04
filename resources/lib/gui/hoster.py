@@ -60,12 +60,11 @@ class cHosterGui:
         else:
             oGui.showError('xStream', 'Hosterlink not found', 5)
             return False
-        if sLink != False:
-            try:
-                logger.info(sLink.msg)
-                sLink = 'http://www.example.de'
-            except:
-                pass
+        try:
+            msg = sLink.msg
+        except:
+            msg = False
+        if sLink != False and not msg:
             logger.info('file link: ' + str(sLink))
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(self.SITE_NAME)
@@ -87,15 +86,16 @@ class cHosterGui:
             oPlayer = cPlayer()
             oPlayer.clearPlayList()
             oPlayer.addItemToPlaylist(oGuiElement)
-            #if self.dialog:
-            #    try:
-            #        self.dialog.close()
-            #    except:
-            #        pass
+            if self.dialog:
+               try:
+                   self.dialog.close()
+               except:
+                   pass
             oPlayer.startPlayer()
+            return True #Necessary for autoStream
         else:
-            logger.info('file link: ' + str(sLink))
-            #oGui.showError('xStream', 'File deleted or Link could not be resolved', 5)
+            logger.info('File link: ' + str(sLink))
+            print str(msg)
             return False
 
         
@@ -380,22 +380,20 @@ class cHosterGui:
             self.dialog.create('xStream','try hosters...')
             total = len(hosters)
             count = 1
-            for hoster in hosters:
-                if self.dialog.iscanceled() or xbmc.abortRequested: return
+            for hoster in hosters:               
+                if self.dialog.iscanceled() or xbmc.abortRequested or check: return
                 percent = count/total*100
                 try:
                     logger.info('try hoster %s' % hoster['name'])
                     # get stream links
                     function = getattr(plugin, functionName)
                     siteResult = function(hoster['link'])
-                    #check = self.__autoEnqueue(siteResult, playMode)
-                    if self.__autoEnqueue(siteResult, playMode):
-                        break
+                    check = self.__autoEnqueue(siteResult, playMode)
+                    if check:                      
                         return True
                 except:
                     self.dialog.update(percent,'hoster %s failed' % hoster['name'])
                     logger.info('playback with hoster %s failed' % hoster['name'])
-                    pass
         # field "resolved" marks streamlinks
         elif 'resolved' in siteResult[0]:
             for stream in siteResult:
@@ -423,6 +421,7 @@ class cHosterGui:
             except:
                 return False
                 raise
+        logger.info('autoEnqueue successful')
         return True
 
 
