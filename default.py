@@ -24,4 +24,11 @@ from xstream import run
 log('*---- Running xStream, version %s ----*' % __settings__.getAddonInfo('version'))
 #import cProfile
 #cProfile.run('run()',translatePath(join(__cwd__,'xstream.pstats')))
-run()
+try:
+    run()
+except Exception, err:
+    import traceback
+    import xbmcgui
+    print traceback.format_exc()
+    dialog = xbmcgui.Dialog().ok('xStream Error',str(err.__class__.__name__),str(err))
+    
