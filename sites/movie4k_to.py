@@ -1,6 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
 from resources.lib.util import cUtil
-from resources.lib.handler.hosterHandler import cHosterHandler
 from resources.lib.parser import cParser
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.handler.ParameterHandler import ParameterHandler
