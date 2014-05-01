@@ -44,6 +44,7 @@ class XstreamPlayer(xbmc.Player):
                     mediaType = params.getValue('mediaType')
                     imdbID = params.getValue('imdbID')
                     name = params.getValue('Title')
+                    TVShowTitle = params.getValue('TVShowTitle')
                     if params.exist('season'):
                         season = params.getValue('season')
                         if int(season) > 0:mediaType = 'season'
@@ -55,10 +56,9 @@ class XstreamPlayer(xbmc.Player):
                             metaInfo = meta.get_meta(self._mediaType, self.__sTitle, imdbID)
                         elif mediaType == 'season':
                             metaInfo = meta.get_seasons(TVShowTitle, imdbID, str(season))
-                        elif mediaType == 'episode':
+                        elif mediaType == 'episode' and TVShowTitle:
                             metaInfo = meta.get_episode_meta(TVShowTitle, imdbID, str(season), str(episode))
-
-                        if metaInfo and metaInfo['overlay'] == '6':
+                        if metaInfo and int(metaInfo['overlay']) == 6:
                             meta.change_watched(mediaType, name, imdbID, season=season, episode=episode)
                             xbmc.executebuiltin("XBMC.Container.Refresh")
                     else:
