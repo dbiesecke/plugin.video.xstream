@@ -17,7 +17,7 @@ SITE_IDENTIFIER = 'megatv_to'
 SITE_NAME = 'MegaTV.to'
 SITE_ICON = 'megatv_to.jpg'
 
-URL_MAIN = 'http://www.megatv.to'
+URL_MAIN = 'http://isigoing.tv/'
 
 
 def load():
@@ -54,7 +54,7 @@ def _showChannels(sUrl):
     oGui = cGui()
     channels = _parseChannels(sUrl)
     for channel in channels:
-            oGuiElement = cGuiElement(channel['name'], SITE_IDENTIFIER,'getHosters')#'playChannel')
+            oGuiElement = cGuiElement(channel['name'], SITE_IDENTIFIER,'playChannel')
             logger.info(channel['logo'])
             oGuiElement.setThumbnail(channel['logo'])
             oParams = ParameterHandler()
@@ -77,8 +77,7 @@ def _parseChannels(sUrl):
         channels.append(channel)
     return channels
 
-#def playChannel():
-def getHosters():
+def playChannel():
     oParams = ParameterHandler()
     sChannelUrl = oParams.getValue('channelUrl')
     sChannelName = oParams.getValue('channelName')
@@ -98,18 +97,8 @@ def getHosters():
         logger.info('load channel ' + sChannelName + ' with url ' + sUrl)
 
         hoster = {}
-        hoster['link'] = sUrl
-        hoster['name'] = 'streamcloud'  # dummy
+        hoster['streamUrl'] = sUrl
+        hoster['resolved'] = True
         hosters.append(hoster)
-    hosters.append('getHosterUrl')
     return hosters
-
-def getHosterUrl(sUrl):
-    logger.info("getHosterUrl with url %s" % (sUrl))
-    results = []
-    result = {}
-    result['streamUrl'] = sUrl
-    result['resolved'] = True
-    results.append(result)
-    return results
 

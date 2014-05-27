@@ -9,6 +9,7 @@
         <string id="30005">choose hoster automatically</string>
         <string id="30006">cachetime for websites (seconds)</string>
         <string id="30007">show hosterlist as folder</string>
+        <string id="30008">metahandler replaces infos from site</string>
 
         <!-- settingtabs begin by 30021 - 30030 -->
         <string id="30021">General</string>

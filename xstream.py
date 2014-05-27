@@ -19,8 +19,8 @@ def changeWatched(params):
         return
     #videoType, name, imdbID, season=season, episode=episode, year=year, watched=watched
     try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
+        #import resources.lib.handler.xmetahandler as metahandlers
+        from metahandler import metahandlers
         meta = metahandlers.MetaData()
         season = ''
         episode = ''
@@ -46,10 +46,10 @@ def updateMeta(params):
         return
     #videoType, name, imdbID, season=season, episode=episode, year=year, watched=watched
     try:
-        import resources.lib.handler.metaHandler as metahandlers
-        #from metahandler import metahandlers
+        #import resources.lib.handler.xmetahandler as metahandlers
+        from metahandler import metahandlers
     except Exception as e:
-        logger.info("Could not import package 'metaHandler'")
+        logger.info("Could not import package 'metahandler'")
         logger.info(e)
         return
     meta = metahandlers.MetaData()
@@ -147,11 +147,15 @@ def parseUrl():
     
     if params.exist('playMode'):
         from resources.lib.gui.hoster import cHosterGui
+        url = False
         playMode = params.getValue('playMode')
+        isHoster = params.getValue('isHoster')
+        if isHoster == 'true':
+            url = params.getValue('url')    
         if cConfig().getSetting('autoPlay')=='true' and playMode != 'jd':
             cHosterGui().streamAuto(playMode, sSiteName, sFunction)
         else:        
-            cHosterGui().stream(playMode, sSiteName, sFunction)
+            cHosterGui().stream(playMode, sSiteName, sFunction, url)
         return
         
     else:    
@@ -290,6 +294,8 @@ def searchGlobal():
                 function(oGui, sSearchText)
             except:
                 logger.info(str(pluginName)+': search failed')
+                import traceback
+                print traceback.format_exc()
         oGui.setView()
         oGui.setEndOfDirectory()
     return True

@@ -391,7 +391,6 @@ def parseNews():
     total = len(aResult[1])
     # Create an entry for every news line
     for aEntry in aResult[1]:
-        print aEntry
         sLang = __createLanguage(aEntry[0])
         sTitle = cUtil().unescape(aEntry[2]).strip()
         if sTitle.endswith(':'):
@@ -664,8 +663,10 @@ def ajaxCall():
 
                 oParams.setParam('sUrl', sUrl)
                 if sMediaType == 'series':
+                    oGuiElement.setMediaType('tvshow')
                     oGui.addFolder(oGuiElement, oParams, iTotal = total)
                 else:
+                    oGuiElement.setMediaType('movie')
                     oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
 
         # check for next site

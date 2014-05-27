@@ -93,7 +93,7 @@ def __getSecurityCookieValue():
         logger.info('ChallengeForm not found')
         return False
     aResult = aResult[1][0]
-    constant = 13
+    constant = len(oRequest.getRealUrl().split('/')[2])
     exp = aResult[0]
     url = aResult[1]
     valueName1 = aResult[2]
@@ -101,8 +101,8 @@ def __getSecurityCookieValue():
     valueName2 = aResult[4]
     value2 = str(eval(exp)+constant)
     url = '%s%s?%s=%s&%s=%s' % (URL_MAIN, url, valueName1, value1, valueName2, value2)
-    oRequest = cRequestHandler(url, False, True)
-    oRequest.addHeaderEntry('Host', 'www.g-stream.in')
+    oRequest = cRequestHandler(url, caching = False, ignoreErrors = True)
+    oRequest.addHeaderEntry('Host', 'g-stream.in')
     oRequest.addHeaderEntry('Referer', URL_MAIN)
     oRequest.addHeaderEntry('Connection', 'keep-alive')
     oRequest.addHeaderEntry('DNT', '1')
@@ -129,9 +129,9 @@ def __getHtmlContent(sUrl = None, sSecurityValue=None):
 
     # Make the request
     oRequest = cRequestHandler(sUrl)
-    oRequest.addHeaderEntry('Cookie', sSecurityValue)
-    oRequest.addHeaderEntry('Accept', '*/*')
-    oRequest.addHeaderEntry('Host', 'g-stream.in')
+    #oRequest.addHeaderEntry('Cookie', sSecurityValue)
+    #oRequest.addHeaderEntry('Accept', '*/*')
+    #oRequest.addHeaderEntry('Host', 'g-stream.in')
 
     return oRequest.request()
     
@@ -185,6 +185,8 @@ def displaySearch():
 def _search(oGui, sSearchText):
     params = ParameterHandler()
     sSearchType = params.getValue('searchType')
+    if not sSearchType:
+        sSearchType = '528'
     sUrl = URL_SEARCH+'?do=process&childforums=1&do=process&exactname=1&forumchoice[]='+sSearchType+\
         '&query=' + str(sSearchText) + '&quicksearch=1&s=&securitytoken=guest&titleonly=1'
     oRequest = cRequestHandler(sUrl)
@@ -212,7 +214,7 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
     #sPattern = 'class="alt1Active".*?<a href="(forumdisplay.php[^"]+)".*?>([^<]+)<.*?(src="([^"]+)|</td>).*?</tr>' #Serien
     # request
     sHtmlContent = __getHtmlContent(sUrl = siteUrl)
-
+    sHtmlContent
     # parse content
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)

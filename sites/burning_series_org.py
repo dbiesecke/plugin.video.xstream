@@ -45,6 +45,7 @@ def _search(oGui, sSearchText):
     sUrl = URL_SERIES
     oRequestHandler = cRequestHandler(sUrl)
     oRequestHandler.addHeaderEntry('Referer', 'http://burning-seri.es/')
+    params = ParameterHandler()
     sHtmlContent = oRequestHandler.request()
     sPattern = "<ul id='serSeries'>(.*?)</ul>"
     oParser = cParser()

@@ -207,7 +207,7 @@ class cGuiElement:
             episode = self._episode
 
         try:
-            import resources.lib.handler.metaHandler as metahandlers
+            import resources.lib.handler.xmetahandler as metahandlers
             #from metahandler import metahandlers
         except:
             logger.info("Could not import package 'metahandler'")

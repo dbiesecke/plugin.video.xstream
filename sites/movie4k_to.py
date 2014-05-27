@@ -412,6 +412,7 @@ def __parseMovieSimpleList(sUrl, iPage, oGui, sHtmlContent = False):
                     oGuiElement.setFunction('showHostersSeries')
                 elif sUrl.find('tvshows-') != -1:
                     oOutputParameterHandler.setParam('sLanguageToken',sLanguageToken)
+                    oGuiElement.setMediaType('tvshow')
                     oGuiElement.setFunction('parseMovieSimpleList')
                 else:
                     oGuiElement.setFunction('showAllSeasons')
@@ -528,7 +529,7 @@ def showFeaturedSeries():
                     oGuiElement.setTitle(sMovieTitle)
                     oGuiElement.setThumbnail(sThumbnail)
                     oGuiElement.setLanguage(__getLanguage(aEntry[3]))
-                    
+                    oGuiElement.setMediaType('tvshow')
                     oOutputParameterHandler = ParameterHandler()
                     oOutputParameterHandler.setParam('sUrl', newUrl)
                     

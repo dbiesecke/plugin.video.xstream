@@ -1,3 +1,4 @@
+import metahandler
 import metahandler.common as common
 from metahandler.TMDB import TMDB
 from metahandler import thetvdbapi

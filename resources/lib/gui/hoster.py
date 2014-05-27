@@ -4,7 +4,6 @@ from resources.lib.download import cDownload
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.player import cPlayer
-from resources.lib.handler.requestHandler import cRequestHandler
 import urlresolver
 import logger
 
@@ -186,12 +185,6 @@ class cHosterGui:
             self.dialog.close()
         logger.info('call send to JDownloader: ' + sMediaUrl)       
         cJDownloaderHandler().sendToJDownloader(sMediaUrl)
-
-        
-    def __getRedirectUrl(self, sUrl):
-        oRequest = cRequestHandler(sUrl)
-        oRequest.request()
-        return oRequest.getRealUrl()
         
 
     def __getPriorities(self, hosterList, filter = True):
@@ -217,7 +210,7 @@ class cHosterGui:
         return hosterQueue
 
         
-    def stream(self, playMode, siteName, function):
+    def stream(self, playMode, siteName, function, url):
         self.dialog = xbmcgui.DialogProgress()
         self.dialog.create('xStream',"get stream/hoster")
         #load site as plugin and run the function
@@ -225,7 +218,10 @@ class cHosterGui:
         plugin = __import__(siteName, globals(), locals())
         function = getattr(plugin, function)
         self.dialog.update(10,'catch links...')
-        siteResult = function()
+        if url:
+            siteResult = function(url)
+        else:
+            siteResult = function()
         self.dialog.update(80)
         if not siteResult:
             self.dialog.close()
@@ -332,6 +328,7 @@ class cHosterGui:
                 name = hoster['name']
             oGuiElement = cGuiElement(name, siteName, functionName)
             params.setParam('url',hoster['link'])
+            params.setParam('isHoster','true')
             oGui.addFolder(oGuiElement, params, iTotal = total, isHoster = True)
         oGui.setEndOfDirectory()
 

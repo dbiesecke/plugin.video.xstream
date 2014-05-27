@@ -12,6 +12,17 @@ import xbmcplugin
 import urllib
 import sys,os
 
+#import xbmcaddon
+#from sys import path
+#from xbmc import translatePath
+
+#traktPath = xbmcaddon.Addon(id = 'script.trakt').getAddonInfo('path')
+#print traktPath
+#path.append(translatePath(traktPath))
+#import traktapi
+#watchedList = traktapi.traktAPI().getWatchedEpisodeLibrary()
+#print watchedList
+
 class cGui:
     '''
     This class "abstracts" a list of xbmc listitems.
@@ -30,6 +41,10 @@ class cGui:
            self.isMetaOn = True
         else:
            self.isMetaOn = False
+        if cConfig().getSetting('metaOverwrote')=='true':
+           self.metaMode = 'replace'
+        else:
+           self.metaMode = 'add'
 
 
     def addFolder(self, oGuiElement, oOutputParameterHandler='', bIsFolder = True, iTotal = 0, isHoster = False):
@@ -39,9 +54,9 @@ class cGui:
         if not oGuiElement._isMetaSet and self.isMetaOn and oGuiElement._mediaType:
             imdbID = oOutputParameterHandler.getValue('imdbID')
             if imdbID:
-                oGuiElement.getMeta(oGuiElement._mediaType, imdbID)
+                oGuiElement.getMeta(oGuiElement._mediaType, imdbID, mode = self.metaMode)
             else:
-                oGuiElement.getMeta(oGuiElement._mediaType)
+                oGuiElement.getMeta(oGuiElement._mediaType, mode = self.metaMode)
         
         sItemUrl = self.__createItemUrl(oGuiElement, bIsFolder, oOutputParameterHandler)
         oListItem = self.createListItem(oGuiElement)       
@@ -66,7 +81,7 @@ class cGui:
         
     def createListItem(self, oGuiElement):
         '''
-        creates a standrad xbmcgui.listitem from the GuiElement
+        creates a standard xbmcgui.listitem from the GuiElement
         '''
         itemValues= oGuiElement.getItemValues()
         itemTitle = oGuiElement.getTitle()
