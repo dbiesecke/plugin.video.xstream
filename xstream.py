@@ -19,7 +19,6 @@ def changeWatched(params):
         return
     #videoType, name, imdbID, season=season, episode=episode, year=year, watched=watched
     try:
-        #import resources.lib.handler.xmetahandler as metahandlers
         from metahandler import metahandlers
         meta = metahandlers.MetaData()
         season = ''
@@ -46,7 +45,6 @@ def updateMeta(params):
         return
     #videoType, name, imdbID, season=season, episode=episode, year=year, watched=watched
     try:
-        #import resources.lib.handler.xmetahandler as metahandlers
         from metahandler import metahandlers
     except Exception as e:
         logger.info("Could not import package 'metahandler'")

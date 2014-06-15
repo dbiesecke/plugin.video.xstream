@@ -23,8 +23,7 @@ class XstreamPlayer(xbmc.Player):
         if cConfig().getSetting('metahandler')=='true':
             META = True
             try:
-                import resources.lib.handler.xmetahandler as metahandlers
-                #from metahandler import metahandlers
+                from metahandler import metahandlers
             except Exception as e:
                 META = False
                 logger.info("Could not import package 'metahandler'")
