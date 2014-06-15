@@ -1,3 +1,16 @@
+﻿- Version 2.1.7 - 15.6.2014
+================================================================================
+    - Fix BS and Gstream Search
+    - Fix Gstream Cloudflare protection
+    - Add "Require XBMC Python" tag for passibility to install Addon under
+      Gotham
+    - Add Setting to define if metahandler is allowed to overwrite metadata
+      received from sites
+    - more general call to create hoster list as folder
+    - further usage of metahandler
+    - fix auto watched marking
+    - show more accurate error windows
+
 - Version 2.1.6 - 4.2.2014
 ================================================================================
     - fix: Bundesliga.de
