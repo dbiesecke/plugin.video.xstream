@@ -324,6 +324,7 @@ def parseMovieSimpleList():
 
     if (params.exist('sUrl')):
         sUrl = params.getValue('sUrl')
+        logger.info(sUrl)
         if (sUrl.find('tvshows-season-') != -1):
             sPattern = '<TR>\s*<TD.*?id="tdmovies".*?<a href="([^"]+)">(.*?)\s*</a>.*?<img border=0 src="http://[^/]+/img/([^"]+)".*?</TR>'
             if params.exist('sLanguageToken'):
@@ -654,7 +655,7 @@ def __getMovieTitle(sHtmlContent):
 def parseHosterDirect(sHtmlContent, sHoster = '', sMovieTitle = ''):
     oParser = cParser()
     #Link oder Iframe suchen der den Hosternamen enthält
-    sPattern = 'id="maincontent5".*?(?:target="_blank" href|iframe.*?src|value)="([^"]+)".*?id="underplayer">'
+    sPattern = 'id="maincontent5".*?(?:target="_blank" href|iframe[^<]+src|value)="([^"]+)".*?id="underplayer">'
     aResult = oParser.parse(sHtmlContent, sPattern)
     if (aResult[0] == True):
         sStreamUrl = aResult[1][0]    
