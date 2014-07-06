@@ -835,7 +835,7 @@ def getHosterUrlandPlay(sUrl = False):
     ii = 1
     for sPartUrl in aMovieParts:
         sPartUrl = sPartUrl.replace('\\/', '/')
-        oRequest = cRequestHandler(sUrl)
+        oRequest = cRequestHandler(sUrl+'&Part='+str(ii))
         oRequest.addHeaderEntry('Cookie', sSecurityValue)
         oRequest.addHeaderEntry('Referer', 'http://kinox.to/')
         sHtmlContent = oRequest.request()
