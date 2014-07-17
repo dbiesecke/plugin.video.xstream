@@ -152,6 +152,9 @@ class cGui:
             if cConfig().getSetting('jd_enabled') == 'true':
                 oContextItem.setTitle("send to JDownloader")
                 aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s&playMode=jd)" % (sItemUrl,),)]   
+	    if cConfig().getSetting('pyload_enabled') == 'true':
+		oContextItem.setTitle("send to PyLoad")     
+         	aContextMenus+= [ ( oContextItem.getTitle(), "XBMC.RunPlugin(%s&playMode=pyload)" % (sItemUrl,),)]
         oListItem.addContextMenuItems(aContextMenus)
         #oListItem.addContextMenuItems(aContextMenus, True)  
         return oListItem

@@ -1,5 +1,6 @@
 ﻿# -*- coding: utf-8 -*-
 from resources.lib.handler.jdownloaderHandler import cJDownloaderHandler
+from resources.lib.handler.pyLoadHandler import cPyLoadHandler
 from resources.lib.download import cDownload
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
@@ -173,6 +174,21 @@ class cHosterGui:
             return False
         return True
         
+		
+    def sendToPyLoad(self, sMediaUrl = False):
+	params = ParameterHandler()
+        
+        logger.info('jetzz bin ich dran')
+        sHosterIdentifier = params.getValue('sHosterIdentifier')
+        if not sMediaUrl:            
+            sMediaUrl = params.getValue('sMediaUrl')            
+        sFileName = params.getValue('sFileName')
+        if self.dialog:
+            self.dialog.close()
+        logger.info('call send to PyLoad: ' + sMediaUrl)       
+        cPyLoadHandler().sendToPyLoad(sMediaUrl)
+        
+
         
     def sendToJDownloader(self, sMediaUrl = False):
         params = ParameterHandler()
@@ -218,12 +234,12 @@ class cHosterGui:
         plugin = __import__(siteName, globals(), locals())
         function = getattr(plugin, function)
         self.dialog.update(10,'catch links...')
-        if url:
+	if url:
             siteResult = function(url)
         else:
             siteResult = function()
         self.dialog.update(80)
-        if not siteResult:
+	if not siteResult:
             self.dialog.close()
             cGui().showInfo('xStream','stream/hoster not available')
             return
@@ -233,15 +249,17 @@ class cHosterGui:
             temp.append(siteResult)
             siteResult = temp
         # field "name" marks hosters
-        if 'name' in siteResult[0]:
+        logger.info('middel')
+	if 'name' in siteResult[0]:
             functionName = siteResult[-1]
             del siteResult[-1]
             if not siteResult:
                 self.dialog.close()
                 cGui().showInfo('xStream','no hoster available')
                 return
+
             self.dialog.update(90,'prepare hosterlist..')                
-            if playMode !='jd':
+            if (playMode !='jd') and (playMode != 'pyload'):
                 # filter and sort hosters
                 siteResult = self.__getPriorities(siteResult)
             if not siteResult:
@@ -250,7 +268,7 @@ class cHosterGui:
                 return
             self.dialog.update(100)
             self.dialog.close()
-            if len(siteResult)>1:
+	    if len(siteResult)>1:
                 #choose hoster
                 if cConfig().getSetting('hosterListFolder')=='true':
                     self.showHosterFolder(siteResult, siteName, functionName)
@@ -263,7 +281,8 @@ class cHosterGui:
             # get stream links
             logger.info(siteResult['link'])
             function = getattr(plugin, functionName)
-            siteResult = function(siteResult['link'])       
+            siteResult = function(siteResult['link'])
+	    logger.info('toto')       
             # if result is not a list, make in one
             if not type(siteResult) is list:
                 temp = []
@@ -278,6 +297,7 @@ class cHosterGui:
                     return
         else:
             siteResult = siteResult[0]
+	logger.info('TEST!')
         if playMode == 'play':
             self.play(siteResult)
         elif playMode == 'download':
@@ -286,6 +306,9 @@ class cHosterGui:
             self.addToPlaylist(siteResult)
         elif playMode == 'jd':
             self.sendToJDownloader(siteResult['streamUrl'])
+	elif playMode == 'pyload':
+	    logger.info('los gehts!')
+	    self.sendToPyLoad(siteResult['streamUrl'])
 
 
     def checkForResolver(self,sHosterFileName):
