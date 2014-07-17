@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from resources.lib.handler.jdownloaderHandler import cJDownloaderHandler
 from resources.lib.handler.pyLoadHandler import cPyLoadHandler
 from resources.lib.download import cDownload
@@ -178,7 +178,7 @@ class cHosterGui:
     def sendToPyLoad(self, sMediaUrl = False):
 	params = ParameterHandler()
         
-        logger.info('jetzz bin ich dran')
+        
         sHosterIdentifier = params.getValue('sHosterIdentifier')
         if not sMediaUrl:            
             sMediaUrl = params.getValue('sMediaUrl')            
@@ -249,7 +249,7 @@ class cHosterGui:
             temp.append(siteResult)
             siteResult = temp
         # field "name" marks hosters
-        logger.info('middel')
+        
 	if 'name' in siteResult[0]:
             functionName = siteResult[-1]
             del siteResult[-1]
@@ -282,7 +282,7 @@ class cHosterGui:
             logger.info(siteResult['link'])
             function = getattr(plugin, functionName)
             siteResult = function(siteResult['link'])
-	    logger.info('toto')       
+	          
             # if result is not a list, make in one
             if not type(siteResult) is list:
                 temp = []
@@ -297,7 +297,7 @@ class cHosterGui:
                     return
         else:
             siteResult = siteResult[0]
-	logger.info('TEST!')
+	
         if playMode == 'play':
             self.play(siteResult)
         elif playMode == 'download':
@@ -307,7 +307,6 @@ class cHosterGui:
         elif playMode == 'jd':
             self.sendToJDownloader(siteResult['streamUrl'])
 	elif playMode == 'pyload':
-	    logger.info('los gehts!')
 	    self.sendToPyLoad(siteResult['streamUrl'])
 
 
