@@ -1,12 +1,10 @@
 from resources.lib.util import cUtil
 from resources.lib.config import cConfig
 from resources.lib.gui.gui import cGui
-from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.config import cConfig
 import logger
 import urllib
 import urllib2
-import sys
 
 
 class cPyLoadHandler:
@@ -33,9 +31,8 @@ class cPyLoadHandler:
 
 			#check if host has a leading http://
 			if(py_host.find('http://') != 0):
-				logger.info('adding http:// on top of pyload_host')
 				py_host = 'http://'+py_host
-
+			logger.info('Attemting to connect to PyLoad at: '+py_host+':'+py_port)
 			req=urllib2.Request(py_host+':'+py_port+'/api/login', mydata)
 			req.add_header("Content-type", "application/x-www-form-urlencoded")
 			page=urllib2.urlopen(req).read()
