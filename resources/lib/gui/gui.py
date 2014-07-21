@@ -41,7 +41,7 @@ class cGui:
            self.isMetaOn = True
         else:
            self.isMetaOn = False
-        if cConfig().getSetting('metaOverwrote')=='true':
+        if cConfig().getSetting('metaOverwrite')=='true':
            self.metaMode = 'replace'
         else:
            self.metaMode = 'add'
