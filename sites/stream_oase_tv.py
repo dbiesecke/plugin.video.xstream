@@ -4,8 +4,6 @@ from resources.lib.util import cUtil
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
-from resources.lib.gui.hoster import cHosterGui
-from resources.lib.handler.hosterHandler import cHosterHandler
 import logger
 from ParameterHandler import *
 from resources.lib.config import cConfig
@@ -13,7 +11,7 @@ from resources.lib.config import cConfig
     
 SITE_IDENTIFIER = 'stream_oase_tv'
 SITE_NAME = 'Stream-Oase.tv'
-#SITE_ICON = 'stream-oase.png'
+SITE_ICON = 'stream_oase_tv.png'
 
 URL_MAIN = 'http://stream-oase.tv'
 URL_HD_GENRE = 'http://stream-oase.tv/index.php/hd-oase'

@@ -57,7 +57,7 @@ def updateMeta(params):
     imdbID = params.getValue('imdbID')
     name = str(params.getValue('title'))
     year = params.getValue('year')
-    print mediaType
+    print "MedienType: "+mediaType
     if (mediaType == 'movie' or mediaType == 'tvshow') :
         # show meta search input
         oGui = cGui()
@@ -70,7 +70,7 @@ def updateMeta(params):
                     logger.info('error or nothing found')
                     foundInfo = False
             elif mediaType == 'tvshow':
-                foundInfo = metahandlers.TheTVDB().get_matching_shows(sSearchText)
+                foundInfo = metahandlers.TheTVDB().get_matching_shows(sSearchText, language="all")
             else:
                 return
         else:
@@ -111,7 +111,7 @@ def updateMeta(params):
         elif season:
             meta.update_season(name, imdbID, season)
         else:
-            meta.update_meta(mediaType, name, imdbID, new_imdb_id=str(item[2]), year=year) 
+            meta.update_meta(mediaType, name, imdbID, new_imdb_id=str(item[2]), new_tmdb_id=str(item[0]), year=year) 
     #print params.getAllParameters()
     xbmc.executebuiltin("XBMC.Container.Refresh")
     return
@@ -209,11 +209,11 @@ def showMainMenu(sFunction):
       # Create a gui element for every plugin found
       for aPlugin in aPlugins:
         oGuiElement = cGuiElement()
-        oGuiElement.setTitle(aPlugin[0])
-        oGuiElement.setSiteName(aPlugin[1])
+        oGuiElement.setTitle(aPlugin['name'])
+        oGuiElement.setSiteName(aPlugin['id'])
         oGuiElement.setFunction(sFunction)
-        if aPlugin[2] != '':
-            oGuiElement.setThumbnail(aPlugin[2])
+        if aPlugin['icon'] != '':
+            oGuiElement.setThumbnail(aPlugin['icon'])
         oGui.addFolder(oGuiElement)
       
       # Create a gui element for global search
@@ -279,8 +279,8 @@ def searchGlobal():
         aPlugins = []
         aPlugins = cPluginHandler().getAvailablePlugins()
         for pluginEntry in aPlugins:
-            pluginName = pluginEntry[0]
-            pluginSiteName = pluginEntry[1]
+            pluginName = pluginEntry['id']
+            pluginSiteName = pluginEntry['name']
             logger.info('Searching for "'+sSearchText+'" at '+pluginName)
             try:
                 plugin = __import__(pluginSiteName, globals(), locals())
