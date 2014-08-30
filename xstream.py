@@ -150,7 +150,7 @@ def parseUrl():
         isHoster = params.getValue('isHoster')
         if isHoster == 'true':
             url = params.getValue('url')    
-        if cConfig().getSetting('autoPlay')=='true' and playMode != 'jd':
+        if cConfig().getSetting('autoPlay')=='true' and playMode != 'jd' and playMode != 'pyload':
             cHosterGui().streamAuto(playMode, sSiteName, sFunction)
         else:        
             cHosterGui().stream(playMode, sSiteName, sFunction, url)

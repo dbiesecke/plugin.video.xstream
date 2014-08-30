@@ -176,9 +176,7 @@ class cHosterGui:
         
 		
     def sendToPyLoad(self, sMediaUrl = False):
-	params = ParameterHandler()
-        
-        
+        params = ParameterHandler()      
         sHosterIdentifier = params.getValue('sHosterIdentifier')
         if not sMediaUrl:            
             sMediaUrl = params.getValue('sMediaUrl')            

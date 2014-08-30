@@ -2,7 +2,7 @@
 import os
 import urllib
 import urllib2
-from resources.lib import mechanize
+import mechanize
 import xbmc
 import xbmcgui
 
