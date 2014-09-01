@@ -17,7 +17,7 @@
         <string id="30023">JDownloader Einstellungen</string>
         <string id="30024">Downloads</string>
 
-        <!-- Downloads begin by 30071 - 30075 -->
+        <!-- Downloads begin by 30071 - 30086 -->
         <string id="30070">JDownloader</string>
         <string id="30071">JDownloader an/aus</string>
         <string id="30072">Host</string>
@@ -26,6 +26,9 @@
         <string id="30075">Sende nur an LinkGrabber</string>
         <string id="30080">XBMC-Download</string>
         <string id="30081">Download-Verzeichnis</string>
+        <string id="30082">PyLoad an/aus</string>
+        <string id="30083">Benutzername</string>
+        <string id="30084">Passwort</string>
   
   
         <string id="30302">Staffeln Deutsch</string>

@@ -7,7 +7,7 @@
     <import addon="xbmc.python"                 version="2.1.0"/>
     <import addon="script.module.urlresolver"   version="2.4.0"/>
     <import addon="script.module.metahandler"   version="1.0.0"/>
-    <import addon="script.module.mechanize"     version="1.0.0"/>
+    <import addon="script.module.mechanize"     version="0.2.6"/>
   </requires>
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>

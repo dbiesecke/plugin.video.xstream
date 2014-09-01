@@ -26,6 +26,9 @@
         <string id="30075">Send to LinkGrabber only</string>
         <string id="30080">XBMC-Download</string>
         <string id="30081">Download-folder</string>
+        <string id="30082">PyLoad on/off</string>
+        <string id="30083">Username</string>
+        <string id="30084">Password</string>
   
         <string id="30302">Seasons german</string>
         <string id="30303">Seasons english</string>
