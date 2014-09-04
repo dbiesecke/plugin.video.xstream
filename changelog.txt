@@ -1,10 +1,18 @@
-﻿- Version 2.1.9 - 01.09.2014
+﻿- Version 2.1.9a - 04.09.2014
+================================================================================
+    - fix: global search
+    - fix: site import error
+    - fix: alternativ playback options (contect menu) when using setting:
+      "hoster list as folder"
+
+- Version 2.1.9 - 01.09.2014
 ================================================================================
     - fix: kinox multipart movies
     - fix: metahandler can overwrite metainfo received from sites
     - add: send download link to PyLoad [thx to hau1]
     - switch to external script.module.mechanize v0.2.6
-    - add pluginDB for faster addon start  
+    - add pluginDB for faster addon start 
+ 
 - Version 2.1.8 - 29.6.2014
 ================================================================================
     - fix: m4k get hoster link

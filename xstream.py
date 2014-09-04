@@ -287,7 +287,7 @@ def searchGlobal():
                 function = getattr(plugin, '_search')
                 oGuiElement = cGuiElement('[B][COLOR yellow]----'+pluginName+'----[/COLOR][/B]',pluginSiteName,'spacer')
                 if len(pluginEntry)>2:
-                    oGuiElement.setThumbnail(pluginEntry[2])
+                    oGuiElement.setThumbnail(pluginEntry['icon'])
                 oGui.addFolder(oGuiElement)
                 function(oGui, sSearchText)
             except:
