@@ -57,17 +57,17 @@ class cGui:
                 oGuiElement.getMeta(oGuiElement._mediaType, imdbID, mode = self.metaMode)
             else:
                 oGuiElement.getMeta(oGuiElement._mediaType, mode = self.metaMode)
-        
+
         sItemUrl = self.__createItemUrl(oGuiElement, bIsFolder, oOutputParameterHandler)
-        oListItem = self.createListItem(oGuiElement)       
-        oListItem = self.__createContextMenu(oGuiElement, oListItem, bIsFolder, sItemUrl, oOutputParameterHandler)
-                 
-        #if not bIsFolder:
-        #    oListItem.setProperty('IsPlayable', 'true')        
+        oListItem = self.createListItem(oGuiElement) 
         if not bIsFolder and cConfig().getSetting('hosterListFolder') == 'true':
             bIsFolder = True
         if isHoster:
             bIsFolder = False
+        oListItem = self.__createContextMenu(oGuiElement, oListItem, bIsFolder, sItemUrl, oOutputParameterHandler)
+                 
+        #if not bIsFolder:
+        #    oListItem.setProperty('IsPlayable', 'true')        
         xbmcplugin.addDirectoryItem(self.pluginHandle, sItemUrl, oListItem, isFolder = bIsFolder, totalItems = iTotal)
         
 

@@ -279,8 +279,8 @@ def searchGlobal():
         aPlugins = []
         aPlugins = cPluginHandler().getAvailablePlugins()
         for pluginEntry in aPlugins:
-            pluginName = pluginEntry['id']
-            pluginSiteName = pluginEntry['name']
+            pluginName = pluginEntry['name']
+            pluginSiteName = pluginEntry['id']
             logger.info('Searching for "'+sSearchText+'" at '+pluginName)
             try:
                 plugin = __import__(pluginSiteName, globals(), locals())

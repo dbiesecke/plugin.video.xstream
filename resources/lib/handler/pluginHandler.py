@@ -148,7 +148,7 @@ class cPluginHandler:
             plugin = __import__(fileName, globals(), locals())
             pluginData['name'] = plugin.SITE_NAME                       
         except Exception, e:
-            logger.error("Can't import plugin: %s :%s" % (sName, e))
+            logger.error("Can't import plugin: %s :%s" % (fileName, e))
             return False
         try:
             pluginData['icon'] = plugin.SITE_ICON
