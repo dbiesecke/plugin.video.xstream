@@ -23,6 +23,6 @@ def __writeLog(sLog, cLogLevel):
     params = ParameterHandler()
     if params.exist('site'):
         site = params.getValue('site')
-        print "\t[PLUGIN] xStream->" + site + ": " + str(sLog)
+        print "\t[PLUGIN] xStream->" + site + ": " + str(sLog).decode('utf-8')
     else:
-        print "\t[PLUGIN] xStream: " + str(sLog)
+        print "\t[PLUGIN] xStream: " + str(sLog).decode('utf-8')

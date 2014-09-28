@@ -5,17 +5,17 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib.config import cConfig
-import logger
-from ParameterHandler import *
+import resources.lib.logger
+from resources.lib.handler.ParameterHandler import ParameterHandler
 
 SITE_IDENTIFIER = 'gstream_in'
-SITE_NAME = 'G-Stream.in'
+SITE_NAME = 'G-Stream'
 SITE_ICON = 'gstream.png'
 
-URL_MAIN = 'http://g-stream.in'
-URL_SHOW_MOVIE = 'http://g-stream.in/showthread.php?t='
-URL_CATEGORIES = 'http://g-stream.in/forumdisplay.php?f='
-URL_SEARCH = 'http://g-stream.in/search.php'
+URL_MAIN = 'http://gstream.to'
+URL_SHOW_MOVIE = 'http://gstream.to/showthread.php?t='
+URL_CATEGORIES = 'http://gstream.to/forumdisplay.php?f='
+URL_SEARCH = 'http://gstream.to/search.php'
 
 
 def load():
@@ -102,7 +102,7 @@ def __getSecurityCookieValue():
     value2 = str(eval(exp)+constant)
     url = '%s%s?%s=%s&%s=%s' % (URL_MAIN, url, valueName1, value1, valueName2, value2)
     oRequest = cRequestHandler(url, caching = False, ignoreErrors = True)
-    oRequest.addHeaderEntry('Host', 'g-stream.in')
+    oRequest.addHeaderEntry('Host', 'gstream.to')
     oRequest.addHeaderEntry('Referer', URL_MAIN)
     oRequest.addHeaderEntry('Connection', 'keep-alive')
     oRequest.addHeaderEntry('DNT', '1')
@@ -131,7 +131,7 @@ def __getHtmlContent(sUrl = None, sSecurityValue=None):
     oRequest = cRequestHandler(sUrl)
     #oRequest.addHeaderEntry('Cookie', sSecurityValue)
     #oRequest.addHeaderEntry('Accept', '*/*')
-    #oRequest.addHeaderEntry('Host', 'g-stream.in')
+    #oRequest.addHeaderEntry('Host', 'gstream.to')
 
     return oRequest.request()
     
@@ -168,7 +168,7 @@ def showXXX():
     
 def showHDMovies():
     oGui = cGui()
-    sUrl = 'http://g-stream.in/search.php?do=process&prefixchoice[]=hd'
+    sUrl = 'http://gstream.to/search.php?do=process&prefixchoice[]=hd'
     iPage = 1
     __parseMovieResultSite(oGui, sUrl, sUrl)
     oGui.setEndOfDirectory()    
@@ -321,7 +321,7 @@ def getHosters():
             for aEntry in aResult[1]:
                 sUrl = aEntry[0]
                 # extract hoster domainname            
-                if 'g-stream.in/secure/' in sUrl :
+                if 'gstream.to/secure/' in sUrl :
                     sHoster = sUrl.split('secure/')[-1].split('/')[0].split('.')[-2]
                 else:
                     sHoster = sUrl.split('//')[-1].split('/')[0].split('.')[-2]
@@ -337,7 +337,7 @@ def getHosterUrl(sUrl = False):
     if not sUrl:
         sUrl =  params.getValue('url')
     results = []
-    if 'g-stream.in/secure/' in sUrl :
+    if 'gstream.to/secure/' in sUrl :
         sHoster = sUrl.split('secure/')[-1].split('/')[0]       
         oRequest = cRequestHandler(sUrl, False)
         oRequest.addHeaderEntry('Cookie', params.getValue('securityCookie'))

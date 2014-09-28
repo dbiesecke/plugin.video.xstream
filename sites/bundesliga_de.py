@@ -149,11 +149,11 @@ def play():
     if (params.exist('sUrl') and params.exist('sTitle')):
         sUrl = params.getValue('sUrl')
         sTitle = params.getValue('sTitle')
-        
+        print sUrl
         oRequest = cRequestHandler(sUrl)
         sHtmlContent = oRequest.request()
 
-        sPattern = 'flv=([^\.]+)\.flv'
+        sPattern = ': "([^\."]+)\.flv"'
         oParser = cParser()
         aResult = oParser.parse(sHtmlContent, sPattern)
         if (aResult[0] == True):
