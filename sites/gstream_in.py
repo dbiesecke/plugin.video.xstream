@@ -5,7 +5,7 @@ from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.handler.requestHandler import cRequestHandler
 from resources.lib.parser import cParser
 from resources.lib.config import cConfig
-import resources.lib.logger
+from resources.lib.logger import *
 from resources.lib.handler.ParameterHandler import ParameterHandler
 
 SITE_IDENTIFIER = 'gstream_in'
