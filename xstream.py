@@ -4,7 +4,7 @@ from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.config import cConfig
-import logger
+from resources.lib import logger
 import xbmc
 import xbmcgui
 import sys
@@ -279,7 +279,7 @@ def searchGlobal():
         aPlugins = []
         aPlugins = cPluginHandler().getAvailablePlugins()
         for pluginEntry in aPlugins:
-            pluginName = pluginEntry['name']
+            pluginName = str(pluginEntry['name'])
             pluginSiteName = pluginEntry['id']
             logger.info('Searching for "'+sSearchText+'" at '+pluginName)
             try:
@@ -291,7 +291,7 @@ def searchGlobal():
                 oGui.addFolder(oGuiElement)
                 function(oGui, sSearchText)
             except:
-                logger.info(str(pluginName)+': search failed')
+                logger.info(pluginName+': search failed')
                 import traceback
                 print traceback.format_exc()
         oGui.setView()
