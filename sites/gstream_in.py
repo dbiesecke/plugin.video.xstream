@@ -210,7 +210,7 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
         normalySiteUrl = siteUrl+'&page='
     params = ParameterHandler()  
 
-    sPattern = '<a class="p1" href="[^"]+".*?<img class="large" src="(http://[^"]+)"(.*?)<a href="([^"]+)" id="([^"]+)">([^<]+)<(.*?)</tr>'
+    sPattern = 'class="p1".*?<img class="large" src="(http://[^"]+)".*?<a href="[^"]+" id="([^"]+)"(.*?)>([^<]+)</a>(.*?)</tr>'
     #sPattern = 'class="alt1Active".*?<a href="(forumdisplay.php[^"]+)".*?>([^<]+)<.*?(src="([^"]+)|</td>).*?</tr>' #Serien
     # request
     sHtmlContent = __getHtmlContent(sUrl = siteUrl)
@@ -221,22 +221,21 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
     if (aResult[0] == False):
         return
     total = len(aResult[1])  
-    for aEntry in aResult[1]:
-        sMovieTitle = aEntry[4].replace('&amp;','&')
+    for img, link, hdS, title, yearS  in aResult[1]:
+        sMovieTitle = title.replace('&amp;','&')
         sTitle = sMovieTitle
-        sUrl = URL_SHOW_MOVIE + str(aEntry[3]).replace('thread_title_', '')
+        sUrl = URL_SHOW_MOVIE + str(link).replace('thread_title_', '')
         year = ''
-        aResult = oParser.parse(aEntry[5], ' ([0-9]{4}) -')
+        aResult = oParser.parse(yearS, ' ([0-9]{4}) -')
         if aResult[0]:
             year = aResult[1][0]
-        aResult = oParser.parse(aEntry[1], '(title="HD Quali")')
+        aResult = oParser.parse(hdS, '(title="HD Quali")')
         if aResult[0]:
             sTitle = sTitle + ' [HD]'
-        
         oGuiElement = cGuiElement(sTitle,SITE_IDENTIFIER,'getHosters')
         oGuiElement.setMediaType('movie')
         oGuiElement.setYear(year)
-        oGuiElement.setThumbnail(aEntry[0])      
+        oGuiElement.setThumbnail(img)      
         params.setParam('movieUrl', sUrl)
         params.setParam('sMovieTitle', sMovieTitle)       
         oGui.addFolder(oGuiElement, params, bIsFolder = False, iTotal = total)
