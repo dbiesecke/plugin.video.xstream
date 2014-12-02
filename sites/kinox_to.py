@@ -15,26 +15,28 @@ from resources.lib import jsunprotect
 SITE_IDENTIFIER = 'kinox_to'
 SITE_NAME = 'Kinox.to'
 SITE_ICON = 'kinox.png'
+oConfig = cConfig()
+domain = oConfig.getSetting('kinox_to-domain')
+####
+URL_MAIN = 'http://' + domain
+URL_CINEMA_PAGE = URL_MAIN + '/Cine-Films.html'
+URL_GENRE_PAGE = URL_MAIN +'/Genre.html'
+URL_MOVIE_PAGE = URL_MAIN + '/Movies.html'
+URL_SERIE_PAGE = URL_MAIN + '/Series.html'
+URL_DOCU_PAGE = URL_MAIN + '/Documentations.html'
 
-URL_MAIN = 'http://kinox.to'
-URL_CINEMA_PAGE = 'http://kinox.to/Cine-Films.html'
-URL_GENRE_PAGE = 'http://kinox.to/Genre.html'
-URL_MOVIE_PAGE = 'http://kinox.to/Movies.html'
-URL_SERIE_PAGE = 'http://kinox.to/Series.html'
-URL_DOCU_PAGE = 'http://kinox.to/Documentations.html'
+URL_FAVOURITE_MOVIE_PAGE = URL_MAIN + '/Popular-Movies.html'
+URL_FAVOURITE_SERIE_PAGE = URL_MAIN + '/Popular-Series.html'
+URL_FAVOURITE_DOCU_PAGE = URL_MAIN + '/Popular-Documentations.html'
 
-URL_FAVOURITE_MOVIE_PAGE = 'http://kinox.to/Popular-Movies.html'
-URL_FAVOURITE_SERIE_PAGE = 'http://kinox.to/Popular-Series.html'
-URL_FAVOURITE_DOCU_PAGE = 'http://kinox.to/Popular-Documentations.html'
+URL_LATEST_SERIE_PAGE = URL_MAIN + '/Latest-Series.html'
+URL_LATEST_DOCU_PAGE = URL_MAIN + '/Latest-Documentations.html'
 
-URL_LATEST_SERIE_PAGE = 'http://kinox.to/Latest-Series.html'
-URL_LATEST_DOCU_PAGE = 'http://kinox.to/Latest-Documentations.html'
-
-URL_SEARCH = 'http://kinox.to/Search.html'
-URL_MIRROR = 'http://kinox.to/aGET/Mirror/'
-URL_EPISODE_URL = 'http://kinox.to/aGET/MirrorByEpisode/'
-URL_AJAX = 'http://kinox.to/aGET/List/'
-URL_LANGUAGE = 'http://kinox.to/aSET/PageLang/1'
+URL_SEARCH = URL_MAIN + '/Search.html'
+URL_MIRROR = URL_MAIN + '/aGET/Mirror/'
+URL_EPISODE_URL = URL_MAIN + '/aGET/MirrorByEpisode/'
+URL_AJAX = URL_MAIN + '/aGET/List/'
+URL_LANGUAGE = URL_MAIN + '/aSET/PageLang/1'
 
 
 def load():
@@ -187,14 +189,13 @@ def __getHtmlContent(sUrl = None, sSecurityValue = None):
     # Make the request
     oRequest = cRequestHandler(sUrl)
     oRequest.addHeaderEntry('Cookie', sPrefLang+sSecurityValue+'ListDisplayYears=Always;')
-    oRequest.addHeaderEntry('Referer', 'http://kinox.to/')
+    oRequest.addHeaderEntry('Referer', URL_MAIN)
     oRequest.addHeaderEntry('Accept', '*/*')
-    oRequest.addHeaderEntry('Host', 'kinox.to')
+    oRequest.addHeaderEntry('Host', domain)
 
     return oRequest.request()
     
 def __getPreferredLanguage():
-    oConfig = cConfig()
     sLanguage = oConfig.getSetting('prefLanguage')
     if sLanguage == '0':
         sPrefLang = 'ListNeededLanguage=25%2C24%2C26%2C2%2C5%2C6%2C7%2C8%2C11%2C15%2C16%2C9%2C12%2C13%2C14%2C17%2C4'
@@ -500,7 +501,7 @@ def _cinema(oGui):
             oGuiElement.setTitle(__createTitleWithLanguage(lang, sMovieTitle))
             oGuiElement.setDescription(aEntry[3])
             oGuiElement.setMediaType('movie')
-            oGuiElement.setThumbnail(aEntry[2])
+            oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
             oGuiElement.addItemValue('rating',rating)
             #if META:
             #    oMetaget = metahandlers.MetaData()
@@ -700,7 +701,7 @@ def ajaxCall():
                 sMovieTitle = aEntry[0]
                 oGuiElement = cGuiElement(sMovieTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
                 oGuiElement.setDescription(aEntry[3])
-                oGuiElement.setThumbnail(aEntry[2])
+                oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
                 oParams.setParam('sUrl', URL_MAIN + str(aEntry[1]))
                 if sMediaType == 'series':
                     oGui.addFolder(oGuiElement, oParams, iTotal = total)

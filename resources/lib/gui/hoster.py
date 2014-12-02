@@ -27,6 +27,7 @@ class cHosterGui:
             # self.autoPlay = True
         # else:
             # self.autoPlay = False
+        self.maxHoster = int(cConfig().getSetting('maxHoster'))
         self.dialog = False
 
 
@@ -34,13 +35,15 @@ class cHosterGui:
         oGui = cGui()
         params = ParameterHandler()
         sMediaUrl = params.getValue('sMediaUrl')
-        sFileName = params.getValue('sFileName')
-        if not sFileName:
-            sFileName = params.getValue('Title')
+        sFileName = params.getValue('MovieTitle')
         if not sFileName:
             sFileName = params.getValue('title')
+        if not sFileName:
+            sFileName = params.getValue('Title')
         if not sFileName: #nur vorrübergehend
             sFileName = params.getValue('sMovieTitle')
+        if not sFileName:
+            sFileName = params.getValue('title')
         sSeason = params.getValue('season')
         sEpisode = params.getValue('episode')
         sShowTitle = params.getValue('TvShowTitle')
@@ -104,13 +107,15 @@ class cHosterGui:
         params = ParameterHandler()
 
         sMediaUrl = params.getValue('sMediaUrl')
-        sFileName = params.getValue('sFileName')
-        if not sFileName:
-            sFileName = params.getValue('Title')
+        sFileName = params.getValue('MovieTitle')
         if not sFileName:
             sFileName = params.getValue('title')
+        if not sFileName:
+            sFileName = params.getValue('Title')
         if not sFileName: #nur vorrübergehend
             sFileName = params.getValue('sMovieTitle')
+        if not sFileName:
+            sFileName = params.getValue('title')
         sSeason = params.getValue('season')
         sEpisode = params.getValue('episode')
         sShowTitle = params.getValue('TvShowTitle')
@@ -232,12 +237,12 @@ class cHosterGui:
         plugin = __import__(siteName, globals(), locals())
         function = getattr(plugin, function)
         self.dialog.update(10,'catch links...')
-	if url:
+        if url:
             siteResult = function(url)
         else:
             siteResult = function()
         self.dialog.update(80)
-	if not siteResult:
+        if not siteResult:
             self.dialog.close()
             cGui().showInfo('xStream','stream/hoster not available')
             return
@@ -248,7 +253,7 @@ class cHosterGui:
             siteResult = temp
         # field "name" marks hosters
         
-	if 'name' in siteResult[0]:
+        if 'name' in siteResult[0]:
             functionName = siteResult[-1]
             del siteResult[-1]
             if not siteResult:
@@ -266,7 +271,9 @@ class cHosterGui:
                 return
             self.dialog.update(100)
             self.dialog.close()
-	    if len(siteResult)>1:
+            if len(siteResult) > self.maxHoster:
+                siteResult = siteResult[:self.MaxHoster-1]
+            if len(siteResult)>1:
                 #choose hoster
                 if cConfig().getSetting('hosterListFolder')=='true':
                     self.showHosterFolder(siteResult, siteName, functionName)
@@ -304,8 +311,8 @@ class cHosterGui:
             self.addToPlaylist(siteResult)
         elif playMode == 'jd':
             self.sendToJDownloader(siteResult['streamUrl'])
-	elif playMode == 'pyload':
-	    self.sendToPyLoad(siteResult['streamUrl'])
+        elif playMode == 'pyload':
+            self.sendToPyLoad(siteResult['streamUrl'])
 
 
     def checkForResolver(self,sHosterFileName):
@@ -393,6 +400,8 @@ class cHosterGui:
                 self.dialog.close()
                 cGui().showInfo('xStream','no supported hoster available')
                 return False
+            if len(siteResult) > self.maxHoster:
+                siteResult = siteResult[:self.MaxHoster-1]
             check = False
             self.dialog.create('xStream','try hosters...')
             total = len(hosters)

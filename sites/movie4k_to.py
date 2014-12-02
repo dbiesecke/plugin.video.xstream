@@ -14,22 +14,24 @@ from resources.lib import jsunprotect
 SITE_IDENTIFIER = 'movie4k_to'
 SITE_NAME = 'Movie4k.to'
 SITE_ICON = 'movie2k.jpg'
-
-URL_MAIN = 'http://www.movie4k.to/'
+oConfig = cConfig()
+DOMAIN = oConfig.getSetting('movie4k_to-domain')
+####
+URL_MAIN = 'http://www.' + DOMAIN
 URL_MOVIES = URL_MAIN
-URL_MOVIES_ALL = 'http://www.movie4k.to/movies-all'
-URL_MOVIES_GENRE = 'http://www.movie4k.to/genres-movies.html'
+URL_MOVIES_ALL = URL_MAIN + '/movies-all'
+URL_MOVIES_GENRE = URL_MAIN + '/genres-movies.html'
 
-URL_SERIES = 'http://www.movie4k.to/tvshows_featured.php'
-URL_SERIES_ALL = 'http://www.movie4k.to/tvshows-all'
-URL_SERIES_TOP = 'http://www.movie4k.to/tvshows-top.html'
-URL_SERIES_GENRE = 'http://www.movie4k.to/genres-tvshows.html'
+URL_SERIES = URL_MAIN + '/tvshows_featured.php'
+URL_SERIES_ALL = URL_MAIN + '/tvshows-all'
+URL_SERIES_TOP = URL_MAIN + '/tvshows-top.html'
+URL_SERIES_GENRE = URL_MAIN + '/genres-tvshows.html'
 
-URL_XXX = 'http://www.movie4k.to/xxx-updates.html'
-URL_XXX_ALL = 'http://www.movie4k.to/xxx-all'
-URL_XXX_GENRE = 'http://www.movie4k.to/genres-xxx.html'
+URL_XXX = URL_MAIN + '/xxx-updates.html'
+URL_XXX_ALL = URL_MAIN +'/xxx-all'
+URL_XXX_GENRE = URL_MAIN + '/genres-xxx.html'
 
-URL_SEARCH = 'http://www.movie4k.to/movies.php?list=search'
+URL_SEARCH = URL_MAIN + '/movies.php?list=search'
 
 
 def load():
@@ -119,7 +121,7 @@ def __clearProtection():
         logger.info(result)
         oRequestHandler = cRequestHandler(URL_MAIN+'?'+result, False)
         oRequestHandler.addHeaderEntry('Referer', URL_MAIN)
-        oRequestHandler.addHeaderEntry('Host', 'www.movie4k.to')
+        oRequestHandler.addHeaderEntry('Host', 'www'+DOMAIN)
         oRequestHandler.request()
         return ''
     
@@ -265,7 +267,7 @@ def _search(oGui, sSearchText):
     #oRequest.addParameters('securekey', key)
     response = oRequest.request()
     sUrl = URL_SEARCH
-    __parseMovieSimpleList(sUrl, 1, oGui, response)
+    #__parseMovieSimpleList(sUrl, 1, oGui, response)
 
 def __checkForNextPage(sHtmlContent, iCurrentPage):
     iNextPage = int(iCurrentPage) + 1
@@ -378,7 +380,7 @@ def __parseMovieSimpleList(sUrl, iPage, oGui, sHtmlContent = False):
         oRequest = cRequestHandler(sUrl)
         sHtmlContent = __getHtmlContent(sUrl)
     
-    sPattern = '<TR.*?<TD.*?id="tdmovies".*?<a href="([^"]+)">(.*?)\s*</a>.*?<img border=0 src="http://[^/]+/img/([^"]+)".*?</TR>'
+    sPattern = '<TR.*?<TD.*?id="tdmovies".*?<a href="([^"]+)">(.*?)\s*</a>.*?<img border=0 src="/img/([^"]+)".*?</TR>'
     aResult = oParser.parse(sHtmlContent, sPattern)
 
     pattern = "coverPreview([0-9]+)\"\)\.hover.*?<p id='coverPreview'><img src='(.*?)' alt='Image preview'"
@@ -513,7 +515,7 @@ def showFeaturedSeries():
         sPattern = '<div id="maincontenttvshow">(.*?)<BR><BR>'
         aResult = cParser().parse(sHtmlContent,sPattern)
         if aResult[0] == True:
-            sPattern = '<div style="float:left"><a href="([^"]+)"><img src="([^"]+)" border=0.*?title="([^"]+)"></a>.*?<img src="http://img.movie4k.to/img/(.*?).png"'
+            sPattern = '<div style="float:left"><a href="([^"]+)"><img src="([^"]+)" border=0.*?title="([^"]+)"></a>.*?<img src="/img/(.*?).png"'
             sHtmlContent = aResult[1][0]
             aResult = cParser().parse(sHtmlContent, sPattern)
             if aResult[0] == True:
@@ -599,7 +601,7 @@ def showHosters():
         sMovieTitle = params.getValue('sMovieTitle')
         
         sHtmlContent = cRequestHandler(sUrl).request()
-        sPattern = '<tr id="tablemoviesindex2">.*?<a href="([^"]+)">([^<]+)<.*?alt="(.*?) .*?width="16">.*?</a>.*?alt="([^"]+)"'
+        sPattern = '<tr id="tablemoviesindex2">.*?<a href="([^"]+)">([^<]+)<.*?alt="(.*?) .*?width="16">.*?</a>.*?smileys/([1-9]).gif"'
         aResult = cParser().parse(sHtmlContent.replace('\\',''), sPattern)
         if (aResult[0] == True):
             hosters = []
@@ -609,6 +611,8 @@ def showHosters():
                 hoster['name'] = sHoster
                 hoster['link'] = URL_MAIN + aEntry[0]
                 hoster['displayedName'] = aEntry[1] + ' - ' + sHoster + ' - ' + aEntry[3]
+                hoster['quality'] = aEntry[3]
+                hoster['date'] = aEntry[1].strip()
                 hosters.append(hoster)
             hosters.append('showHoster')
             return hosters

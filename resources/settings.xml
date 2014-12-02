@@ -1,9 +1,9 @@
 <settings> 
     <category label="30021">       
-        <!--<setting default="false" id="debug" label="30000" type="bool" />
-        <setting default="2" id="playerType" label="30001" type="enum" values="Auto|MPlayer|DVDPlayer" />-->
+        <!--<setting default="false" id="debug" label="30000" type="bool" />-->
         <setting default="false" id="autoPlay" label="30005" type="bool" />
-        <setting default="false" id="hosterListFolder" label="30007" type="bool" enable="eq(-1,false)"/>
+        <setting default="100" id="maxHoster" label="maximale Laenge Hosterliste" type="number" />
+        <setting default="false" id="hosterListFolder" label="30007" type="bool" enable="eq(-2,false)"/>
         <setting default="2" id="prefLanguage" label="30002" type="enum" values="ger|eng|all" />
         <setting default="false" id="metahandler" label="30004" type="bool" />
         <setting default="false" id="metaOverwrite" label="30008" type="bool" enable="!eq(-1,false)" />
@@ -18,9 +18,11 @@
         <setting default="false" id="plugin_burning_series_org" label="Burning-Seri.es" type="bool" />
         <setting default="false" id="plugin_gstream_in" label="G-Stream.in" type="bool" />
         <setting default="false" id="plugin_kinox_to" label="Kinox.to" type="bool" />
+        <setting default="kinox.to" enable="!eq(-1,false)" id="kinox_to-domain" label="Kinox domain" type="labelenum" values="kinox.to|kinox.me|kinox.tv" />
         <setting default="false" id="plugin_kkiste_to" label="KKiste.to" type="bool" />
         <setting default="false" id="plugin_megatv_to" label="MegaTV.to" type="bool" />
         <setting default="false" id="plugin_movie4k_to" label="Movie4k.to" type="bool" />
+        <setting default="movie4k.to" enable="!eq(-1,false)" id="movie4k_to-domain" label="Movie4k domain" type="labelenum" values="movie4k.to|movie4k.me|movie4k.tv" />
         <setting default="false" id="plugin_stream_oase_tv" label="Stream-Oase.tv" type="bool" />
         <setting type="sep" />
     </category>
