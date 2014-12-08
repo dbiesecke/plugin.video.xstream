@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 from resources.lib.handler.jdownloaderHandler import cJDownloaderHandler
+from resources.lib.handler.ParameterHandler import ParameterHandler
 from resources.lib.handler.pyLoadHandler import cPyLoadHandler
+from resources.lib.config import cConfig
 from resources.lib.download import cDownload
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.player import cPlayer
-import urlresolver
-import logger
-
-from resources.lib.handler.ParameterHandler import ParameterHandler
 import xbmc, xbmcgui
-from resources.lib.config import cConfig
-
+import logger
+import urlresolver
 #test
 import xbmcplugin
 import sys
@@ -37,13 +35,12 @@ class cHosterGui:
         sMediaUrl = params.getValue('sMediaUrl')
         sFileName = params.getValue('MovieTitle')
         if not sFileName:
-            sFileName = params.getValue('title')
-        if not sFileName:
             sFileName = params.getValue('Title')
         if not sFileName: #nur vorrübergehend
             sFileName = params.getValue('sMovieTitle')
         if not sFileName:
             sFileName = params.getValue('title')
+
         sSeason = params.getValue('season')
         sEpisode = params.getValue('episode')
         sShowTitle = params.getValue('TvShowTitle')
@@ -272,7 +269,7 @@ class cHosterGui:
             self.dialog.update(100)
             self.dialog.close()
             if len(siteResult) > self.maxHoster:
-                siteResult = siteResult[:self.MaxHoster-1]
+                siteResult = siteResult[:self.maxHoster-1]
             if len(siteResult)>1:
                 #choose hoster
                 if cConfig().getSetting('hosterListFolder')=='true':
@@ -401,7 +398,7 @@ class cHosterGui:
                 cGui().showInfo('xStream','no supported hoster available')
                 return False
             if len(siteResult) > self.maxHoster:
-                siteResult = siteResult[:self.MaxHoster-1]
+                siteResult = siteResult[:self.maxHoster-1]
             check = False
             self.dialog.create('xStream','try hosters...')
             total = len(hosters)

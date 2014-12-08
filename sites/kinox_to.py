@@ -222,20 +222,20 @@ def __getSecurityCookieValue():
     else:
         logger.info(result)
         oRequestHandler = cRequestHandler(URL_MAIN+'/?'+result, False)
-        oRequestHandler.addHeaderEntry('Referer', 'http://kinox.to/')
+        oRequestHandler.addHeaderEntry('Referer', URL_MAIN)
         #oRequestHandler.addHeaderEntry('Accept', '*/*')
-        oRequestHandler.addHeaderEntry('Host', 'kinox.to')
+        oRequestHandler.addHeaderEntry('Host', domain)
         oRequestHandler.request()
         return ''
     for aEntry in aResult[1][0].split(","):
-		sScriptFile = URL_MAIN + str(aEntry).replace("'","").strip()
+		sScriptFile = URL_MAIN +'/'+ str(aEntry).replace("'","").strip()
 		sScriptFile.replace(" ","")
 
 		logger.info("scriptfile: %s" % sScriptFile)
 		oRequestHandler = cRequestHandler(sScriptFile)
-		oRequestHandler.addHeaderEntry('Referer', 'http://kinox.to/')
+		oRequestHandler.addHeaderEntry('Referer', URL_MAIN)
 		oRequestHandler.addHeaderEntry('Accept', '*/*')
-		oRequestHandler.addHeaderEntry('Host', 'kinox.to')
+		oRequestHandler.addHeaderEntry('Host', domain)
 		sHtmlContent = oRequestHandler.request()
 
     sPattern = "escape\(hsh \+ \"([^\"]+)\"\)"
@@ -251,7 +251,7 @@ def __getSecurityCookieValue():
     sHash = sHashSnippet + sHash
     sSecurityCookieValue = "sitechrx=" + str(sHash) + ";Path=/"
 
-    oRequestHandler = cRequestHandler(URL_MAIN + "/")
+    oRequestHandler = cRequestHandler(URL_MAIN)
     oRequestHandler.addHeaderEntry("Cookie", sSecurityCookieValue)
     oRequestHandler.request()
 
@@ -533,14 +533,7 @@ def parseMovieEntrySite():
                     oGuiElement = cGuiElement(item['title'], SITE_IDENTIFIER, 'showHosters')
                     sShowTitle = sMovieTitle.split('(')[0].split('*')[0]
                     oGuiElement.setMediaType('episode')
-                    #if META and imdbID:
-                    #    oMetaget = metahandlers.MetaData()
-                    #    meta = oMetaget.get_episode_meta(sShowTitle, imdbID, item['season'], item['episode'])
-                    #    meta['TVShowTitle'] = sShowTitle
-                    #    oGuiElement.setItemValues(meta)
-                    #    oGuiElement.setThumbnail(meta['cover_url'])
-                    #    oGuiElement.setFanart(meta['backdrop_url'])
-                    #    oGuiElement.setTitle('%s %s' % (item['title'], meta['title'].encode('utf-8')))
+
                     oParams.addParams({'sUrl':item['url'], 'episode':item['episode'], 'season':item['season'], 'TvShowTitle':sShowTitle})
                     oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = len(aSeriesItems))
             oGui.setView('episodes')
@@ -771,16 +764,16 @@ def __getAjaxContent(sMediaType, iPage, iMediaTypePageId, metaOn , sCharacter=''
         oRequest.addParameters('Per_Page', '30')
         oRequest.addParameters('dir', 'desc')
     oRequest.addHeaderEntry('Cookie', sPrefLang+sSecurityValue+'ListDisplayYears=Always;')
-    oRequest.addHeaderEntry('Referer', 'http://kinox.to/')
+    oRequest.addHeaderEntry('Referer', URL_MAIN)
     oRequest.addHeaderEntry('Accept', '*/*')
-    oRequest.addHeaderEntry('Host', 'kinox.to')
+    oRequest.addHeaderEntry('Host', domain)
     return oRequest.request()
 
 def showHosters(sHtmlContent = '', sTitle = False):
     oParams = ParameterHandler()
     sSecurityValue = oParams.getValue('securityCookie')
     if (sTitle == False):
-        sTitle = oParams.getValue('Title')
+        sTitle = oParams.getValue('title')
     if (oParams.exist('sUrl')):
         sUrl = oParams.getValue('sUrl')
 
@@ -825,7 +818,7 @@ def getHosterUrlandPlay(sUrl = False):
   sUrl = sUrl.replace('&amp;', '&')
   oRequest = cRequestHandler(sUrl)
   oRequest.addHeaderEntry('Cookie', sSecurityValue)
-  oRequest.addHeaderEntry('Referer', 'http://kinox.to/')
+  oRequest.addHeaderEntry('Referer', URL_MAIN)
   sHtmlContent = oRequest.request()
   #pattern for multipart stream
   sPattern = '<a rel=\\\\"(.*?)\\\\"'
@@ -838,7 +831,7 @@ def getHosterUrlandPlay(sUrl = False):
         sPartUrl = sPartUrl.replace('\\/', '/')
         oRequest = cRequestHandler(sUrl+'&Part='+str(ii))
         oRequest.addHeaderEntry('Cookie', sSecurityValue)
-        oRequest.addHeaderEntry('Referer', 'http://kinox.to/')
+        oRequest.addHeaderEntry('Referer', URL_MAIN)
         sHtmlContent = oRequest.request()
         #pattern for stream url (single part)
         sPattern = '<a\shref=\\\\"(.*?)\\\\"'

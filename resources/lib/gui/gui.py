@@ -216,6 +216,7 @@ class cGui:
         #TODO change this, it can cause bugs
         if not bIsFolder:
             oOutputParameterHandler.setParam('playMode','play')
+            oOutputParameterHandler.setParam('MovieTitle',oGuiElement.getTitle())
             
             thumbnail = oGuiElement.getThumbnail()
             if thumbnail:

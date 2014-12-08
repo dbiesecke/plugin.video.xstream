@@ -121,7 +121,7 @@ def __clearProtection():
         logger.info(result)
         oRequestHandler = cRequestHandler(URL_MAIN+'?'+result, False)
         oRequestHandler.addHeaderEntry('Referer', URL_MAIN)
-        oRequestHandler.addHeaderEntry('Host', 'www'+DOMAIN)
+        oRequestHandler.addHeaderEntry('Host', 'www.'+DOMAIN)
         oRequestHandler.request()
         return ''
     
@@ -225,7 +225,7 @@ def showAllEpisodes():
     for aEntry in aResult[1]:
         sUrl = aEntry[0]
         if not sUrl.startswith('http'):
-            sUrl = URL_MAIN + sUrl
+            sUrl = URL_MAIN +'/'+ sUrl
         sMovieTitle = aEntry[1].strip()
         episodeNr = aEntry[1].strip().split(' ')[-1]
                 
@@ -300,7 +300,7 @@ def showGenre():
             for aEntry in aResult[1]:
                 sUrl = aEntry[0].strip()
                 if not (sUrl.startswith('http')):
-                    sUrl = URL_MAIN + sUrl
+                    sUrl = URL_MAIN +'/'+ sUrl
                 sTitle = aEntry[1] + ' (' + aEntry[2] + ')'
                 
                 oGuiElement = cGuiElement()
@@ -338,7 +338,7 @@ def parseMovieSimpleList():
                     for aEntry in aResult[1]:
                         sUrl = str(aEntry[0]).strip()
                         if not (sUrl.startswith('http')):
-                            sUrl = URL_MAIN + sUrl
+                            sUrl = URL_MAIN +'/'+ sUrl
                         if aEntry[2] == sLanguageToken:
                             break
                     oRequest = cRequestHandler(sUrl)
@@ -348,7 +348,7 @@ def parseMovieSimpleList():
                         for aEntry in aResult[1]:
                             sUrl = str(aEntry[0]).strip()
                             if not (sUrl.startswith('http')):
-                                sUrl = URL_MAIN + sUrl
+                                sUrl = URL_MAIN +'/'+ sUrl
                             if aEntry[2] == sLanguageToken:
                                 break
                                 
@@ -366,7 +366,7 @@ def parseMovieSimpleList():
                     if aResult[0] == True:
                         sUrl = str(aResult[1][0][0]).strip()
                         if not (sUrl.startswith('http')):
-                            sUrl = URL_MAIN + sUrl
+                            sUrl = URL_MAIN +'/'+ sUrl
             __getAllSeasons(sUrl)
             
         else:
@@ -394,7 +394,7 @@ def __parseMovieSimpleList(sUrl, iPage, oGui, sHtmlContent = False):
         for aEntry in aResult[1]:
             newUrl = aEntry[0].strip()
             if not (newUrl.startswith('http')):
-                newUrl = URL_MAIN + newUrl
+                newUrl = URL_MAIN +'/'+ newUrl
             sMovieTitle = cUtil().unescape(aEntry[1].strip())
             sMovieTitle = ' '.join(sMovieTitle.split())
             sMovieTitle = ' '.join(sMovieTitle.split())
@@ -434,10 +434,10 @@ def __parseMovieSimpleList(sUrl, iPage, oGui, sHtmlContent = False):
     
     sNextUrl = __checkForNextPage(sHtmlContent, iPage)
     if (sNextUrl != False):      
-        if (sNextUrl.startswith(URL_MAIN)):
-            sNextUrl = sNextUrl.replace(URL_MAIN,'')       
+        if not (sNextUrl.startswith(URL_MAIN)):
+            sNextUrl = URL_MAIN +'/'+ sNextUrl     
         params = ParameterHandler()
-        params.setParam('sUrl', URL_MAIN + sNextUrl)
+        params.setParam('sUrl', sNextUrl)
         params.setParam('iPage', int(iPage) + 1)
         oGui.addNextPage(SITE_IDENTIFIER, 'parseMovieSimpleList',params)
     return oGui
@@ -477,7 +477,7 @@ def showFeaturedMovies():
             for aEntry in aResult[1]:
                 newUrl = aEntry[0]
                 if not (newUrl.startswith('http')):
-                    newUrl = URL_MAIN + newUrl
+                    newUrl = URL_MAIN +'/'+ newUrl
                 
                 sThumbnail = aEntry[1]             
                 sMovieTitle = cUtil().unescape(aEntry[2].strip().replace('kostenlos', ''))                
@@ -523,7 +523,7 @@ def showFeaturedSeries():
                 for aEntry in aResult[1]:
                     newUrl = str(aEntry[0]).strip()
                     if not (newUrl.startswith('http')):
-                        newUrl = URL_MAIN + newUrl
+                        newUrl = URL_MAIN +'/'+ newUrl
                     sThumbnail = aEntry[1]
                     sMovieTitle = aEntry[2].strip().replace('\t', '')                     
                     oGuiElement = cGuiElement()
@@ -583,7 +583,7 @@ def showHostersSeries():
                 sHoster = aEntry[1].strip()
                 hoster = {}
                 hoster['name'] = sHoster
-                hoster['link'] = URL_MAIN + aEntry[0] 
+                hoster['link'] = URL_MAIN +'/'+ aEntry[0] 
                 if hoster['name'] == previousName:
                     hoster['displayedName'] = hoster['name'] + ' ('+str(iMatches)+')'
                     iMatches += 1
@@ -609,8 +609,8 @@ def showHosters():
                 sHoster = aEntry[2].strip()
                 hoster = {}
                 hoster['name'] = sHoster
-                hoster['link'] = URL_MAIN + aEntry[0]
-                hoster['displayedName'] = aEntry[1] + ' - ' + sHoster + ' - ' + aEntry[3]
+                hoster['link'] = URL_MAIN +'/'+ aEntry[0]
+                hoster['displayedName'] = aEntry[1] + ' - ' + sHoster + ' - Quality: ' + aEntry[3]
                 hoster['quality'] = aEntry[3]
                 hoster['date'] = aEntry[1].strip()
                 hosters.append(hoster)
