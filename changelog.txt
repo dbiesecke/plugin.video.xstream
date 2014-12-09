@@ -1,4 +1,13 @@
-﻿- Version 2.1.10c - 03.10.2014
+﻿- Version 2.1.11 - 09.12.2014
+================================================================================
+    - fix: m4k content listing
+    - fix: gstream content listing
+    - fix: kinox covers from site
+    - add: setting to limit hoster list lenght
+    - add: setting to select alternative domains for m4k and kinox
+    - removed: megatv, stream-oase, animeproxer, animestream
+
+- Version 2.1.10c - 03.10.2014
 ================================================================================
     - fix: issues printing Umlaute to log 
 
