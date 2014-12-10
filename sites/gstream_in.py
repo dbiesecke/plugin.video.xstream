@@ -328,7 +328,7 @@ def getHosters():
                 hoster['link'] = sUrl
                 hoster['name'] = sHoster
                 hosters.append(hoster)
-    hosters.append('getHosterUrl')
+            hosters.append('getHosterUrl')
     return hosters
 
 def getHosterUrl(sUrl = False):
