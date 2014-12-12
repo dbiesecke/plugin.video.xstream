@@ -267,7 +267,7 @@ def _search(oGui, sSearchText):
     #oRequest.addParameters('securekey', key)
     response = oRequest.request()
     sUrl = URL_SEARCH
-    #__parseMovieSimpleList(sUrl, 1, oGui, response)
+    __parseMovieSimpleList(sUrl, 1, oGui, response)
 
 def __checkForNextPage(sHtmlContent, iCurrentPage):
     iNextPage = int(iCurrentPage) + 1
