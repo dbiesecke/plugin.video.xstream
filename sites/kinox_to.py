@@ -155,6 +155,8 @@ def __createLanguage(sLangID):
             return 'it'
         elif sLangID == "16":
             return 'nl'
+	elif sLangID == "25":
+	    return 'ru'
         return sLangID
 
 def __checkSubLanguage(sTitle):
@@ -498,7 +500,8 @@ def _cinema(oGui):
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(SITE_IDENTIFIER)
             oGuiElement.setFunction('parseMovieEntrySite')
-            oGuiElement.setTitle(__createTitleWithLanguage(lang, sMovieTitle))
+            oGuiElement.setTitle(sMovieTitle)
+	    oGuiElement.setLanguage(__createLanguage(lang))
             oGuiElement.setDescription(aEntry[3])
             oGuiElement.setMediaType('movie')
             oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
