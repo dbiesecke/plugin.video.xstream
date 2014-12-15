@@ -125,17 +125,6 @@ def showDocuMenu():
     oGui.addFolder(cGuiElement('Neuste Dokumentationen',SITE_IDENTIFIER,'showFavItems'),oParams)
     oGui.setEndOfDirectory()
 
-def __createTitleWithLanguage(sLanguage, sTitle):
-    sTitle = cUtil().unescape(sTitle)
-    if sLanguage == "1":
-        return sTitle + " (de)"
-    elif sLanguage == "2":
-        return sTitle + " (en)"
-    elif sLanguage == "7":
-        return sTitle + " (tu)"
-
-    return sTitle
-
 def __createLanguage(sLangID):
         if sLangID == "1":
             return 'de'
@@ -155,8 +144,8 @@ def __createLanguage(sLangID):
             return 'it'
         elif sLangID == "16":
             return 'nl'
-	elif sLangID == "25":
-	    return 'ru'
+        elif sLangID == "25":
+            return 'ru'
         return sLangID
 
 def __checkSubLanguage(sTitle):
@@ -351,7 +340,7 @@ def showNews():
     oGui = cGui()
     if (aResult[0] == True):
         for aEntry in aResult[1]:
-            sTitle = __createTitleWithLanguage('', aEntry[0]) +  ' (' + str(aEntry[1]) + ')'
+            sTitle = str(aEntry[0]) + ' (' + str(aEntry[1]) + ')'
             oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER,'parseNews')
             oParams.addParams({'sUrl':URL_MAIN, 'page':1, 'mediaType':'news', 'sNewsTitle':aEntry[0]})
             oGui.addFolder(oGuiElement, oParams)
@@ -495,25 +484,17 @@ def _cinema(oGui):
         total = len(aResult[1])
         for aEntry in aResult[1]:
             sMovieTitle = aEntry[0]
-            lang = aEntry[4]
+            lang = __createLanguage(aEntry[4])
             rating = aEntry[5]
             oGuiElement = cGuiElement()
             oGuiElement.setSiteName(SITE_IDENTIFIER)
             oGuiElement.setFunction('parseMovieEntrySite')
+            oGuiElement.setLanguage(lang)
             oGuiElement.setTitle(sMovieTitle)
-	    oGuiElement.setLanguage(__createLanguage(lang))
             oGuiElement.setDescription(aEntry[3])
             oGuiElement.setMediaType('movie')
             oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
             oGuiElement.addItemValue('rating',rating)
-            #if META:
-            #    oMetaget = metahandlers.MetaData()
-            #    meta = oMetaget.get_meta('movie', sMovieTitle)
-            #    oGuiElement.setItemValues(meta)
-            #    oGuiElement.setThumbnail(meta['cover_url'])
-            #    oGuiElement.setFanart(meta['backdrop_url'])
-            #    oParams.setParam('imdbID', meta['imdb_id'])
-
             oParams.setParam('sUrl', URL_MAIN + str(aEntry[1]))
             oGui.addFolder(oGuiElement, oParams, bIsFolder = False, iTotal = total)
 
@@ -686,7 +667,8 @@ def ajaxCall():
 
     else:
         aData = loads(sHtmlContent)
-        sPattern = '<div class="Opt leftOpt Headlne"><a title="(.*?)" href="(.*?)">.*?src="(.*?)".*?class="Descriptor">(.*?)</div'
+        print aData
+        sPattern = '<div class="Opt leftOpt Headlne"><a title="(.*?)" href="(.*?)">.*?src="(.*?)".*?class="Descriptor">(.*?)</div.*?lng/(.*?).png'
         # parse content
         oParser = cParser()
         aResult = oParser.parse(aData['Content'].encode('utf-8'), sPattern)
@@ -694,10 +676,13 @@ def ajaxCall():
         if (aResult[0] == True):
             total = len(aResult[1])
             for aEntry in aResult[1]:
-                sMovieTitle = aEntry[0]
+                sMovieTitle, subLang = __checkSubLanguage(aEntry[0])
+                lang = __createLanguage(aEntry[4])
                 oGuiElement = cGuiElement(sMovieTitle, SITE_IDENTIFIER, 'parseMovieEntrySite')
                 oGuiElement.setDescription(aEntry[3])
                 oGuiElement.setThumbnail(URL_MAIN + str(aEntry[2]))
+                oGuiElement.setLanguage(lang)
+                oGuiElement.setSubLanguage(subLang)
                 oParams.setParam('sUrl', URL_MAIN + str(aEntry[1]))
                 if sMediaType == 'series':
                     oGui.addFolder(oGuiElement, oParams, iTotal = total)
