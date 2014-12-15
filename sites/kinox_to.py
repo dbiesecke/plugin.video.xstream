@@ -155,6 +155,8 @@ def __createLanguage(sLangID):
             return 'it'
         elif sLangID == "16":
             return 'nl'
+	elif sLangID == "25":
+	    return 'ru'
         return sLangID
 
 def __checkSubLanguage(sTitle):
