@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-from resources.lib.handler.jdownloaderHandler import cJDownloaderHandler
 from resources.lib.handler.ParameterHandler import ParameterHandler
-from resources.lib.handler.pyLoadHandler import cPyLoadHandler
 from resources.lib.config import cConfig
-from resources.lib.download import cDownload
 from resources.lib.gui.gui import cGui
 from resources.lib.gui.guiElement import cGuiElement
 from resources.lib.player import cPlayer
 import xbmc, xbmcgui
 import logger
-import urlresolver
 #test
-import xbmcplugin
-import sys
+#import xbmcplugin
+#import sys
 
 class cHosterGui:
 
@@ -30,6 +26,7 @@ class cHosterGui:
 
 
     def play(self, siteResult=False):
+        import urlresolver
         oGui = cGui()
         params = ParameterHandler()
         sMediaUrl = params.getValue('sMediaUrl')
@@ -100,6 +97,7 @@ class cHosterGui:
 
         
     def addToPlaylist(self, siteResult = False):
+        import urlresolver
         oGui = cGui()
         params = ParameterHandler()
 
@@ -150,6 +148,8 @@ class cHosterGui:
         
         
     def download(self, siteResult = False):
+        from resources.lib.download import cDownload
+        import urlresolver
         #oGui = cGui()
         params = ParameterHandler()
 
@@ -178,6 +178,7 @@ class cHosterGui:
         
 		
     def sendToPyLoad(self, sMediaUrl = False):
+        from resources.lib.handler.pyLoadHandler import cPyLoadHandler
         params = ParameterHandler()      
         sHosterIdentifier = params.getValue('sHosterIdentifier')
         if not sMediaUrl:            
@@ -191,8 +192,8 @@ class cHosterGui:
 
         
     def sendToJDownloader(self, sMediaUrl = False):
+        from resources.lib.handler.jdownloaderHandler import cJDownloaderHandler
         params = ParameterHandler()
-
         sHosterIdentifier = params.getValue('sHosterIdentifier')
         if not sMediaUrl:            
             sMediaUrl = params.getValue('sMediaUrl')            
@@ -207,6 +208,7 @@ class cHosterGui:
         '''
         Sort hosters based on their resolvers priority.
         '''
+        import urlresolver
         ranking = []
         for hoster in hosterList:
             #if not self.checkForResolver(hoster['name']):
@@ -238,7 +240,7 @@ class cHosterGui:
             siteResult = function(url)
         else:
             siteResult = function()
-        self.dialog.update(80)
+        self.dialog.update(40)
         if not siteResult:
             self.dialog.close()
             cGui().showInfo('xStream','stream/hoster not available')
@@ -258,8 +260,9 @@ class cHosterGui:
                 cGui().showInfo('xStream','no hoster available')
                 return
 
-            self.dialog.update(90,'prepare hosterlist..')                
-            if (playMode !='jd') and (playMode != 'pyload'):
+            self.dialog.update(80,'prepare hosterlist..')
+            if (playMode !='jd') and (playMode != 'pyload') and \
+                            cConfig().getSetting('presortHoster')=='true':
                 # filter and sort hosters
                 siteResult = self.__getPriorities(siteResult)
             if not siteResult:
@@ -291,7 +294,7 @@ class cHosterGui:
                 temp.append(siteResult)
                 siteResult = temp
         else:
-            self.dialog.close()
+            pass
         # choose part
         if len(siteResult)>1:
             siteResult = self._choosePart(siteResult)
@@ -299,7 +302,10 @@ class cHosterGui:
                     return
         else:
             siteResult = siteResult[0]
-	
+
+
+        self.dialog.update(60,'start opening stream..')
+
         if playMode == 'play':
             self.play(siteResult)
         elif playMode == 'download':
@@ -310,19 +316,6 @@ class cHosterGui:
             self.sendToJDownloader(siteResult['streamUrl'])
         elif playMode == 'pyload':
             self.sendToPyLoad(siteResult['streamUrl'])
-
-
-    def checkForResolver(self,sHosterFileName):
-        if sHosterFileName != '':
-            sHosterFileName = sHosterFileName.lower()
-            source = [urlresolver.HostedMediaFile(url=sHosterFileName)]
-            if (urlresolver.filter_source_list(source)):
-                return source[0].get_host()
-            # media_id is in this case only a dummy
-            source = [urlresolver.HostedMediaFile(host=sHosterFileName, media_id='ABC123XYZ')]            
-            if (urlresolver.filter_source_list(source)):
-                return source[0].get_host()
-        return False
 
     
     def _chooseHoster(self, siteResult):
