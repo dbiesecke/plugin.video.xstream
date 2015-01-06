@@ -405,7 +405,7 @@ class cHosterGui:
             count = 1
             for hoster in hosters:               
                 if self.dialog.iscanceled() or xbmc.abortRequested or check: return
-                percent = count/total*100
+                percent = count*100/total
                 try:
                     logger.info('try hoster %s' % hoster['name'])
                     # get stream links
