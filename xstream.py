@@ -278,9 +278,15 @@ def searchGlobal():
     if (sSearchText != False and sSearchText != ''):
         aPlugins = []
         aPlugins = cPluginHandler().getAvailablePlugins()
+        oGui.dialog = xbmcgui.DialogProgress()
+        oGui.dialog.create('xStream',"Searching...")
+        numPlugins = len(aPlugins)
+        count = 0
         for pluginEntry in aPlugins:
             pluginName = str(pluginEntry['name'])
             pluginSiteName = pluginEntry['id']
+            oGui.dialog.update(count*100/numPlugins,'Searching: '+pluginName+'...')
+            count += 1
             logger.info('Searching for "'+sSearchText+'" at '+pluginName)
             try:
                 plugin = __import__(pluginSiteName, globals(), locals())
@@ -294,6 +300,7 @@ def searchGlobal():
                 logger.info(pluginName+': search failed')
                 import traceback
                 print traceback.format_exc()
+        oGui.dialog.close()
         oGui.setView()
         oGui.setEndOfDirectory()
     return True
