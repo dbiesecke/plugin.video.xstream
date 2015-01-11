@@ -1,4 +1,13 @@
-﻿- Version 2.1.11 - 09.12.2014
+﻿- Version 2.1.12 - 11.01.2015
+================================================================================
+    - fix: gstream content RegEx
+    - fix: pyLoadHandler (config)
+    - add: site kinoleak.tv
+    - add: setting to (de)activate pre-check for supported hosters and sort hosterlist [thx: krellsebastian]
+    - add: progressdialog for globalsearch [thx: kabooom]
+    - change and fix progressdialog for autostream [thx: Dreamdance61, kabooom]
+
+- Version 2.1.11 - 09.12.2014
 ================================================================================
     - fix: m4k content listing
     - fix: gstream content listing
@@ -160,7 +169,7 @@
     - fixed hoster: videozer und videoBB - manche Links liefen trotzdem nicht.
     
 ================================================================================
-- Version 2.0.3
+- Version 2.0.10
 ================================================================================
      - fixed hoster: videozer, videoBB
      - fixed sites: kinox
