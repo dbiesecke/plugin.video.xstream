@@ -395,12 +395,14 @@ class cHosterGui:
             check = False
             self.dialog.create('xStream','try hosters...')
             total = len(hosters)
-            count = 1
+            count = 0
             for hoster in hosters:               
                 if self.dialog.iscanceled() or xbmc.abortRequested or check: return
+                count = count + 1
                 percent = count*100/total
                 try:
                     logger.info('try hoster %s' % hoster['name'])
+                    self.dialog.update(percent,'try hoster %s' % hoster['name'])
                     # get stream links
                     function = getattr(plugin, functionName)
                     siteResult = function(hoster['link'])
