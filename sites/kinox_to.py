@@ -667,7 +667,6 @@ def ajaxCall():
 
     else:
         aData = loads(sHtmlContent)
-        print aData
         sPattern = '<div class="Opt leftOpt Headlne"><a title="(.*?)" href="(.*?)">.*?src="(.*?)".*?class="Descriptor">(.*?)</div.*?lng/(.*?).png'
         # parse content
         oParser = cParser()
