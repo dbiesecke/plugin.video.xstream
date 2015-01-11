@@ -4,6 +4,7 @@
         <setting default="false" id="autoPlay" label="30005" type="bool" />
         <setting default="100" id="maxHoster" label="maximale Laenge Hosterliste" type="number" />
         <setting default="false" id="hosterListFolder" label="30007" type="bool" enable="eq(-2,false)"/>
+        <setting default="true" id="presortHoster" label="30009" type="bool" enable="eq(-3,false)"/>
         <setting default="2" id="prefLanguage" label="30002" type="enum" values="ger|eng|all" />
         <setting default="false" id="metahandler" label="30004" type="bool" />
         <setting default="false" id="metaOverwrite" label="30008" type="bool" enable="!eq(-1,false)" />
