@@ -10,7 +10,7 @@
         <string id="30006">Cachezeit für Webseiten (Sekunden)</string>
         <string id="30007">zeige Hosterliste als Verzeichnis</string>
         <string id="30008">Metahandler ersetzt Infos von Site</string>
-        <string id="30009">Hosterliste vorsortieren und prüfen (langsam)</string>
+        <string id="30009">Hosterliste prüfen und sortieren (langsam auf schwachen Systemen)</string>
 
         <!-- settingtabs begin by 30021 - 30030 -->
         <string id="30021">Allgemein</string>
