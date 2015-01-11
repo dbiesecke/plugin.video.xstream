@@ -109,6 +109,7 @@ class cGuiElement:
             return False
         if year > 0:
             self._sYear = str(year)
+            self.__aItemValues['year'] = year
             return True
         else:
             logger.info('Year given for %s must be greater than 0' % self.getTitle())
@@ -209,7 +210,8 @@ class cGuiElement:
         try:
             from metahandler import metahandlers
         except:
-            logger.info("Could not import package 'metahandler'")
+            import traceback
+            logger.info(traceback.format_exc())
             return False
         if not self._mediaType:
             logger.info('Could not get MetaInformations for %s, mediaType not defined' % self.getTitle())
