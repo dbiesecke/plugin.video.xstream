@@ -6,7 +6,7 @@ import sys, urllib, urllib2
 
 class cPyLoadHandler:
     def __init__(self):
-        config = cConfig()
+        self.config = cConfig()
 
     def sendToPyLoad(self, sUrl):
         logger.info('PyLoad link: '+str(sUrl))
@@ -19,10 +19,10 @@ class cPyLoadHandler:
         logger.info('Sending link...')
         
         try:
-            py_host = config.getSetting('pyload_host')
-            py_port = config.getSetting('pyload_port')
-            py_user = config.getSetting('pyload_user')
-            py_passwd = config.getSetting('pyload_passwd')
+            py_host = self.config.getSetting('pyload_host')
+            py_port = self.config.getSetting('pyload_port')
+            py_user = self.config.getSetting('pyload_user')
+            py_passwd = self.config.getSetting('pyload_passwd')
             mydata = [('username',py_user),('password',py_passwd)]
             mydata = urllib.urlencode(mydata)
 
