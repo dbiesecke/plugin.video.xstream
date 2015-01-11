@@ -210,11 +210,10 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
         normalySiteUrl = siteUrl+'&page='
     params = ParameterHandler()  
 
-    sPattern = 'class="p1".*?<img class="large" src="(http://[^"]+)".*?<a href="[^"]+" id="([^"]+)"(.*?)>([^<]+)</a>(.*?)</tr>'
+    sPattern = 'class="p1".*?<img class="large" src="(http://[^"]+)".*?<a href="[^"]+" id=".*?([^"_]+)"(.*?)>([^<]+)</a>(.*?)</tr>'
     #sPattern = 'class="alt1Active".*?<a href="(forumdisplay.php[^"]+)".*?>([^<]+)<.*?(src="([^"]+)|</td>).*?</tr>' #Serien
     # request
     sHtmlContent = __getHtmlContent(sUrl = siteUrl)
-    sHtmlContent
     # parse content
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
@@ -224,7 +223,7 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
     for img, link, hdS, title, yearS  in aResult[1]:
         sMovieTitle = title.replace('&amp;','&')
         sTitle = sMovieTitle
-        sUrl = URL_SHOW_MOVIE + str(link).replace('thread_title_', '')
+        sUrl = URL_SHOW_MOVIE + str(link)
         year = ''
         aResult = oParser.parse(yearS, ' ([0-9]{4}) -')
         if aResult[0]:
@@ -316,9 +315,9 @@ def getHosters():
         sPattern = 'id="ame_noshow_post.*?<a href="([^"]+)" title="[^"]+" target="_blank">([^<]+)</a>'
         aResult = cParser().parse(sHtmlContent, sPattern)
         if aResult[0] == True:
-            aHosters = []
             for aEntry in aResult[1]:
                 sUrl = aEntry[0]
+                print sUrl
                 # extract hoster domainname            
                 if 'gstream.to/secure/' in sUrl :
                     sHoster = sUrl.split('secure/')[-1].split('/')[0].split('.')[-2]
