@@ -103,7 +103,7 @@ def _search(oGui, sSearchString):
     for link, img, title in aResult[1]:
         sLabel = title.split('(')
         sTitle = sLabel[0].strip()
-        sNextUrl = URL_MAIN + link
+        sNextUrl = link
         params.setParam('siteUrl',sNextUrl)
         oGuiElement = cGuiElement(sTitle, SITE_IDENTIFIER, function)
         oGuiElement.setThumbnail(img)
