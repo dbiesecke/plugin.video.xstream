@@ -791,7 +791,7 @@ def showHosters(sHtmlContent = '', sTitle = False):
                 hoster['link'] = sUrl
                 hoster['displayedName'] = sHoster+mirrorName
                 hosters.append(hoster)
-    hosters.append('getHosterUrlandPlay') 
+        hosters.append('getHosterUrlandPlay') 
     return hosters
                         
 

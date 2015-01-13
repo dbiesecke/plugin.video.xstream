@@ -176,7 +176,7 @@ def getHosters():
           temp = str(temp[0]).split('.')
           hoster['name'] = temp[-2]
           hosters.append(hoster)
-  hosters.append(sFunction)
+    hosters.append(sFunction)
   return hosters
   
 def getHosterUrl(sStreamUrl = False):

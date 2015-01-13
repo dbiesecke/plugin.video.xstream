@@ -250,8 +250,8 @@ class cHosterGui:
             temp = []
             temp.append(siteResult)
             siteResult = temp
-        # field "name" marks hosters
         
+        # field "name" marks hosters
         if 'name' in siteResult[0]:
             functionName = siteResult[-1]
             del siteResult[-1]
@@ -260,7 +260,7 @@ class cHosterGui:
                 cGui().showInfo('xStream','no hoster available')
                 return
 
-            self.dialog.update(80,'prepare hosterlist..')
+            self.dialog.update(60,'prepare hosterlist..')
             if (playMode !='jd') and (playMode != 'pyload') and \
                             cConfig().getSetting('presortHoster')=='true':
                 # filter and sort hosters
@@ -269,8 +269,8 @@ class cHosterGui:
                 self.dialog.close()
                 cGui().showInfo('xStream','no supported hoster available')
                 return
-            self.dialog.update(100)
-            self.dialog.close()
+            self.dialog.update(90)
+            #self.dialog.close()
             if len(siteResult) > self.maxHoster:
                 siteResult = siteResult[:self.maxHoster-1]
             if len(siteResult)>1:
@@ -293,18 +293,19 @@ class cHosterGui:
                 temp = []
                 temp.append(siteResult)
                 siteResult = temp
-        else:
-            pass
+
         # choose part
         if len(siteResult)>1:
             siteResult = self._choosePart(siteResult)
             if not siteResult:
-                    return
+                self.dialog.close()
+                return
         else:
             siteResult = siteResult[0]
 
-
-        self.dialog.update(60,'start opening stream..')
+        self.dialog = xbmcgui.DialogProgress()
+        self.dialog.create('xStream',' ')
+        self.dialog.update(95,'start opening stream..')
 
         if playMode == 'play':
             self.play(siteResult)
