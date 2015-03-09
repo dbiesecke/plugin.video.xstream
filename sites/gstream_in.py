@@ -109,7 +109,7 @@ def __getSecurityCookieValue():
     sHtmlContent = oRequest.request()
     return True 
 
-def __getHtmlContent(sUrl = None, sSecurityValue=None):
+def __getHtmlContent(sUrl = None, sSecurityValue=None, use_caching=True):
     params = ParameterHandler()
 
     # Test if a url is available and set it
@@ -128,7 +128,7 @@ def __getHtmlContent(sUrl = None, sSecurityValue=None):
             sSecurityValue = ''
 
     # Make the request
-    oRequest = cRequestHandler(sUrl)
+    oRequest = cRequestHandler(sUrl,caching=use_caching)
     #oRequest.addHeaderEntry('Cookie', sSecurityValue)
     #oRequest.addHeaderEntry('Accept', '*/*')
     #oRequest.addHeaderEntry('Host', 'gstream.to')
@@ -170,7 +170,7 @@ def showHDMovies():
     oGui = cGui()
     sUrl = 'http://gstream.to/search.php?do=process&prefixchoice[]=hd'
     iPage = 1
-    __parseMovieResultSite(oGui, sUrl, sUrl)
+    __parseMovieResultSite(oGui, sUrl, useSearchId = True)
     oGui.setEndOfDirectory()    
 
 def displaySearch():
@@ -198,21 +198,24 @@ def parseMovieResultSite():
     oGui = cGui()
     params = ParameterHandler()
     if (params.exist('siteUrl')):
-        siteUrl = params.getValue('siteUrl')
-        normalySiteUrl = params.getValue('normalySiteUrl')
         iPage = params.getValue('iPage')
+        normalySiteUrl = params.getValue('normalySiteUrl')
+        siteUrl = params.getValue('siteUrl')
         __parseMovieResultSite(oGui, siteUrl, normalySiteUrl, iPage)
     oGui.setEndOfDirectory()
 
 
-def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
+def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1, useSearchId = False):
     if not normalySiteUrl:
         normalySiteUrl = siteUrl+'&page='
     params = ParameterHandler()  
     sPattern = 'class="p1".*?<img class="large" src="(http://[^"]+)".*?<a href="[^"]+" id=".*?([^"_]+)"(.*?)>([^<]+)</a>(.*?)</tr>'
     #sPattern = 'class="alt1Active".*?<a href="(forumdisplay.php[^"]+)".*?>([^<]+)<.*?(src="([^"]+)|</td>).*?</tr>' #Serien
     # request
-    sHtmlContent = __getHtmlContent(sUrl = siteUrl)
+    use_cache = True
+    if(useSearchId == True):
+        use_cache = False
+    sHtmlContent = __getHtmlContent(sUrl = siteUrl, use_caching = use_cache)
     # parse content
     oParser = cParser()
     aResult = oParser.parse(sHtmlContent, sPattern)
@@ -238,6 +241,11 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
         params.setParam('sMovieTitle', sMovieTitle)       
         oGui.addFolder(oGuiElement, params, bIsFolder = False, iTotal = total)
 
+    # check for searchId
+    if (useSearchId == True):
+        searchId = __getSearchId(sHtmlContent)
+        normalySiteUrl = 'http://gstream.to/search.php?searchid='+str(searchId)+"&page="
+		
     # check for next site
     iTotalPages = __getTotalPages(iPage, sHtmlContent)
     if (iTotalPages >= int(iPage)+1):
@@ -248,7 +256,7 @@ def __parseMovieResultSite(oGui, siteUrl, normalySiteUrl = '', iPage = 1):
         oGui.addNextPage(SITE_IDENTIFIER,'parseMovieResultSite', params, iTotalPages)
 
     if  iTotalPages > 1:
-        oGuiElement = cGuiElement('Go to page x of '+str(iTotalPages),SITE_IDENTIFIER,'gotoPage')
+        oGuiElement = cGuiElement('Go to page x of '+str(iTotalPages)+' (currently page '+str(iPage)+')',SITE_IDENTIFIER,'gotoPage')
         params = ParameterHandler()
         oGui.addFolder(oGuiElement, params)
                 
@@ -271,6 +279,15 @@ def __getTotalPages(iPage, sHtml):
     if (aResult[0] == True):
         iTotalCount = int(aResult[1][0])
         return iTotalCount
+    return 0
+	
+def __getSearchId(sHtml):
+    sPattern = 'searchid=([0-9]+)&'
+    oParser = cParser()
+    aResult = oParser.parse(sHtml, sPattern)
+    if (aResult[0] == True):
+        searchId = int(aResult[1][0])
+        return searchId
     return 0
 
 
