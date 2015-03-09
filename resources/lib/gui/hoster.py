@@ -45,6 +45,8 @@ class cHosterGui:
               
         if siteResult:
             sMediaUrl = siteResult['streamUrl']
+            if sMediaUrl[:8] == '/Out/?s=':
+                sMediaUrl = sMediaUrl[8:]
             logger.info('call play: ' + sMediaUrl)
             if siteResult['resolved']:
                 sLink = sMediaUrl
